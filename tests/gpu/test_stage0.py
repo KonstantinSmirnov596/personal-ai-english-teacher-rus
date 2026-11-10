@@ -48,3 +48,19 @@ def test_word_probabilities_present() -> None:
     assert all(0.0 <= w.p <= 1.0 for w in tr.words)
     assert all(w.end >= w.start for w in tr.words)
     assert sum(w.p for w in tr.words) / len(tr.words) > 0.8
+
+
+def test_espeak_symbols_in_phoneme_vocab() -> None:
+    """Item 0.7: every espeak-ng en-us symbol of the probe words exists in the model vocabulary."""
+    import json
+    from pathlib import Path
+
+    from trainer.model_registry import PHONEME, local_path
+    from trainer.pron.espeak import word_phones
+
+    vocab = json.loads((local_path(PHONEME) / "vocab.json").read_text(encoding="utf-8"))
+    data_file = Path(__file__).resolve().parents[2] / "docs" / "data" / "reading_phrases.json"
+    words = json.loads(data_file.read_text(encoding="utf-8"))["probe_words"]
+    assert len(words) == 20
+    missing = {w: p for w in words for p in word_phones(w) if p not in vocab}
+    assert not missing

@@ -44,6 +44,7 @@ STAGES: dict[int, Stage] = {
             "tests.gpu.test_stage0::test_cuda_device_is_rtx5060",
             "tests.gpu.test_stage0::test_tts_stt_loop_wer",
             "tests.gpu.test_stage0::test_word_probabilities_present",
+            "tests.gpu.test_stage0::test_espeak_symbols_in_phoneme_vocab",
         ),
         reports=("stage0.md", "deepseek.md"),
         files=("uv.lock",),

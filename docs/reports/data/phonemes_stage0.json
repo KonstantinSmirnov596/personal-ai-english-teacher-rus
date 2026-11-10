@@ -1,0 +1,695 @@
+{
+  "espeak_version": "1.52.0",
+  "vocab_size": 392,
+  "words": [
+    {
+      "word": "think",
+      "espeak": [
+        "θ",
+        "ɪ",
+        "ŋ",
+        "k"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "θ",
+          "ɪ",
+          "ŋ",
+          "k"
+        ],
+        "am_michael": [
+          "f",
+          "eɪ",
+          "ŋ",
+          "k",
+          "ɐ"
+        ],
+        "af_bella": [
+          "θ",
+          "ɛ",
+          "ŋ",
+          "k"
+        ]
+      }
+    },
+    {
+      "word": "three",
+      "espeak": [
+        "θ",
+        "ɹ",
+        "iː"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "θ",
+          "ɹ",
+          "iː"
+        ],
+        "am_michael": [
+          "θ",
+          "ɹ",
+          "iː"
+        ],
+        "af_bella": [
+          "θ",
+          "ɹ",
+          "iː"
+        ]
+      }
+    },
+    {
+      "word": "this",
+      "espeak": [
+        "ð",
+        "ɪ",
+        "s"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "ð",
+          "ɪ",
+          "s"
+        ],
+        "am_michael": [
+          "v",
+          "ɪ",
+          "s"
+        ],
+        "af_bella": [
+          "ð",
+          "ɪ",
+          "s"
+        ]
+      }
+    },
+    {
+      "word": "mother",
+      "espeak": [
+        "m",
+        "ʌ",
+        "ð",
+        "ɚ"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "m",
+          "ʌ",
+          "ð",
+          "ɚ"
+        ],
+        "am_michael": [
+          "m",
+          "ʌ",
+          "ð",
+          "ɚ"
+        ],
+        "af_bella": [
+          "m",
+          "ʌ",
+          "ð",
+          "ɚ"
+        ]
+      }
+    },
+    {
+      "word": "west",
+      "espeak": [
+        "w",
+        "ɛ",
+        "s",
+        "t"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "w",
+          "ɛ",
+          "s",
+          "t",
+          "ɪ"
+        ],
+        "am_michael": [
+          "w",
+          "ɛ",
+          "s",
+          "t",
+          "ə",
+          "n"
+        ],
+        "af_bella": [
+          "w",
+          "ɛ",
+          "s",
+          "t"
+        ]
+      }
+    },
+    {
+      "word": "very",
+      "espeak": [
+        "v",
+        "ɛ",
+        "ɹ",
+        "i"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "v",
+          "ɛ",
+          "ɹ",
+          "i"
+        ],
+        "am_michael": [
+          "v",
+          "ɛ",
+          "ɹ",
+          "i"
+        ],
+        "af_bella": [
+          "v",
+          "ɛ",
+          "ɹ",
+          "i"
+        ]
+      }
+    },
+    {
+      "word": "work",
+      "espeak": [
+        "w",
+        "ɜː",
+        "k"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "w",
+          "ɜː",
+          "k"
+        ],
+        "am_michael": [
+          "w",
+          "ɜː",
+          "k"
+        ],
+        "af_bella": [
+          "w",
+          "ɜː",
+          "k"
+        ]
+      }
+    },
+    {
+      "word": "sing",
+      "espeak": [
+        "s",
+        "ɪ",
+        "ŋ"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "s",
+          "ɪ",
+          "ŋ"
+        ],
+        "am_michael": [
+          "s",
+          "ɪ",
+          "ŋ"
+        ],
+        "af_bella": [
+          "s",
+          "ɪ",
+          "ŋ"
+        ]
+      }
+    },
+    {
+      "word": "bad",
+      "espeak": [
+        "b",
+        "æ",
+        "d"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "b",
+          "æ",
+          "d"
+        ],
+        "am_michael": [
+          "b",
+          "æ",
+          "d"
+        ],
+        "af_bella": [
+          "b",
+          "aː",
+          "d"
+        ]
+      }
+    },
+    {
+      "word": "leave",
+      "espeak": [
+        "l",
+        "iː",
+        "v"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "l",
+          "iː",
+          "v",
+          "z"
+        ],
+        "am_michael": [
+          "l",
+          "iː",
+          "v"
+        ],
+        "af_bella": [
+          "l",
+          "iː",
+          "v",
+          "z"
+        ]
+      }
+    },
+    {
+      "word": "ship",
+      "espeak": [
+        "ʃ",
+        "ɪ",
+        "p"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "ʃ",
+          "a",
+          "b",
+          "a"
+        ],
+        "am_michael": [
+          "ʃ",
+          "ɪ",
+          "p"
+        ],
+        "af_bella": [
+          "ʃ",
+          "a",
+          "b"
+        ]
+      }
+    },
+    {
+      "word": "sheep",
+      "espeak": [
+        "ʃ",
+        "iː",
+        "p"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "ʃ",
+          "iː",
+          "b"
+        ],
+        "am_michael": [
+          "ʃ",
+          "iː",
+          "b",
+          "a"
+        ],
+        "af_bella": [
+          "ʃ",
+          "iː",
+          "p"
+        ]
+      }
+    },
+    {
+      "word": "man",
+      "espeak": [
+        "m",
+        "æ",
+        "n"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "m",
+          "æ",
+          "n"
+        ],
+        "am_michael": [
+          "m",
+          "eɪ",
+          "n"
+        ],
+        "af_bella": [
+          "m",
+          "æ",
+          "n"
+        ]
+      }
+    },
+    {
+      "word": "about",
+      "espeak": [
+        "ɐ",
+        "b",
+        "aʊ",
+        "t"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "ɐ",
+          "b",
+          "aʊ",
+          "t"
+        ],
+        "am_michael": [
+          "ɔ",
+          "b",
+          "aʊ",
+          "d"
+        ],
+        "af_bella": [
+          "ɐ",
+          "b",
+          "aʊ",
+          "t"
+        ]
+      }
+    },
+    {
+      "word": "red",
+      "espeak": [
+        "ɹ",
+        "ɛ",
+        "d"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "ɹ",
+          "ɛ",
+          "d"
+        ],
+        "am_michael": [
+          "ɹ",
+          "ɛ",
+          "d"
+        ],
+        "af_bella": [
+          "ɹ",
+          "ɛ",
+          "d"
+        ]
+      }
+    },
+    {
+      "word": "car",
+      "espeak": [
+        "k",
+        "ɑːɹ"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "k",
+          "ɑː"
+        ],
+        "am_michael": [
+          "k",
+          "ɔː"
+        ],
+        "af_bella": [
+          "k",
+          "ɑːɹ",
+          "ɹ"
+        ]
+      }
+    },
+    {
+      "word": "house",
+      "espeak": [
+        "h",
+        "aʊ",
+        "s"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "h",
+          "aʊ",
+          "s"
+        ],
+        "am_michael": [
+          "h",
+          "aʊ",
+          "s"
+        ],
+        "af_bella": [
+          "h",
+          "aʊ",
+          "s"
+        ]
+      }
+    },
+    {
+      "word": "book",
+      "espeak": [
+        "b",
+        "ʊ",
+        "k"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "b",
+          "ɑ",
+          "k",
+          "i"
+        ],
+        "am_michael": [
+          "b",
+          "o",
+          "k"
+        ],
+        "af_bella": [
+          "b",
+          "ɑ",
+          "k"
+        ]
+      }
+    },
+    {
+      "word": "home",
+      "espeak": [
+        "h",
+        "oʊ",
+        "m"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "t",
+          "ɔ",
+          "m"
+        ],
+        "am_michael": [
+          "x",
+          "oː",
+          "m"
+        ],
+        "af_bella": [
+          "th",
+          "uː",
+          "m"
+        ]
+      }
+    },
+    {
+      "word": "water",
+      "espeak": [
+        "w",
+        "ɔː",
+        "ɾ",
+        "ɚ"
+      ],
+      "not_in_vocab": [],
+      "heard": {
+        "af_heart": [
+          "w",
+          "ɑː",
+          "ɾ",
+          "ɚ"
+        ],
+        "am_michael": [
+          "w",
+          "ɑː",
+          "ɾ",
+          "ɚ"
+        ],
+        "af_bella": [
+          "w",
+          "ɑː",
+          "t",
+          "ɚ"
+        ]
+      }
+    }
+  ],
+  "symbols_not_in_vocab": {},
+  "exact_match": {
+    "matched": 34,
+    "total": 60
+  },
+  "substitutions": [
+    {
+      "expected": "ɔː",
+      "heard": "ɑː",
+      "count": 3
+    },
+    {
+      "expected": "p",
+      "heard": "a",
+      "count": 2
+    },
+    {
+      "expected": "p",
+      "heard": "b",
+      "count": 2
+    },
+    {
+      "expected": "ʊ",
+      "heard": "ɑ",
+      "count": 2
+    },
+    {
+      "expected": "θ",
+      "heard": "f",
+      "count": 1
+    },
+    {
+      "expected": "ɪ",
+      "heard": "eɪ",
+      "count": 1
+    },
+    {
+      "expected": "ɪ",
+      "heard": "ɛ",
+      "count": 1
+    },
+    {
+      "expected": "ð",
+      "heard": "v",
+      "count": 1
+    },
+    {
+      "expected": "æ",
+      "heard": "aː",
+      "count": 1
+    },
+    {
+      "expected": "ɪ",
+      "heard": "b",
+      "count": 1
+    },
+    {
+      "expected": "ɪ",
+      "heard": "a",
+      "count": 1
+    },
+    {
+      "expected": "æ",
+      "heard": "eɪ",
+      "count": 1
+    },
+    {
+      "expected": "ɐ",
+      "heard": "ɔ",
+      "count": 1
+    },
+    {
+      "expected": "t",
+      "heard": "d",
+      "count": 1
+    },
+    {
+      "expected": "ɑːɹ",
+      "heard": "ɑː",
+      "count": 1
+    },
+    {
+      "expected": "ɑːɹ",
+      "heard": "ɔː",
+      "count": 1
+    },
+    {
+      "expected": "ʊ",
+      "heard": "o",
+      "count": 1
+    },
+    {
+      "expected": "h",
+      "heard": "t",
+      "count": 1
+    },
+    {
+      "expected": "oʊ",
+      "heard": "ɔ",
+      "count": 1
+    },
+    {
+      "expected": "h",
+      "heard": "x",
+      "count": 1
+    },
+    {
+      "expected": "oʊ",
+      "heard": "oː",
+      "count": 1
+    },
+    {
+      "expected": "h",
+      "heard": "th",
+      "count": 1
+    },
+    {
+      "expected": "oʊ",
+      "heard": "uː",
+      "count": 1
+    },
+    {
+      "expected": "ɾ",
+      "heard": "t",
+      "count": 1
+    }
+  ],
+  "deletions": {},
+  "insertions": {
+    "z": 2,
+    "ɐ": 1,
+    "ɪ": 1,
+    "ə": 1,
+    "n": 1,
+    "a": 1,
+    "b": 1,
+    "ɹ": 1,
+    "i": 1
+  }
+}
