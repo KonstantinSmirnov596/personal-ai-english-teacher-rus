@@ -16,6 +16,14 @@ dependencies = [
     # spaCy model for misaki; pinned here so it is never downloaded at runtime.
     "en-core-web-sm==3.8.0",
     "transformers==5.22.2",
+    # Core server, storage, LLM client, secrets.
+    "fastapi>=0.120",
+    "uvicorn>=0.38",
+    "websockets>=15",
+    "httpx>=0.28",
+    "keyring>=25",
+    "python-multipart>=0.0.20",
+    "num2words>=0.5",
     "soundfile>=0.13",
     "soxr>=0.5",
     "numpy>=2",

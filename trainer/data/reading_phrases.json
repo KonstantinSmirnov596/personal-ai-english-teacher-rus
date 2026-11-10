@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "note": "Фразы для режима «Чтение». targets — идентификаторы из entries каталога l1_ru_catalog.json; tolerances — идентификаторы допусков, которые фраза проверяет. probe_words — 20 слов для сверки символов espeak-ng и фонемной модели (пункт 0.7 плана).",
+  "probe_words": [
+    "think", "three", "this", "mother", "west", "very", "work", "sing", "bad", "leave",
+    "ship", "sheep", "man", "about", "red", "car", "house", "book", "home", "water"
+  ],
+  "phrases": [
+    {"id": "p01", "text": "I think we should work on the third version this week.", "targets": ["th_voiceless", "w_to_v", "v_to_w", "nurse_vowel", "short_i"], "tolerances": []},
+    {"id": "p02", "text": "Thanks for thinking this through with both teams.", "targets": ["th_voiceless", "th_voiced", "ng_to_n"], "tolerances": []},
+    {"id": "p03", "text": "Thirty-three people joined the math club on Thursday.", "targets": ["th_voiceless", "nurse_vowel"], "tolerances": ["flap_t"]},
+    {"id": "p04", "text": "This is the other thing they wanted to gather.", "targets": ["th_voiced", "ng_to_n", "ng_plus_stop"], "tolerances": ["weak_vowel", "weak_forms"]},
+    {"id": "p05", "text": "My brother and father would rather stay together.", "targets": ["th_voiced", "r_trill", "r_dropped"], "tolerances": []},
+    {"id": "p06", "text": "We will review every version of the workflow on Wednesday.", "targets": ["w_to_v", "v_to_w", "nurse_vowel"], "tolerances": []},
+    {"id": "p07", "text": "Victor was very worried about the weather this weekend.", "targets": ["v_to_w", "w_to_v", "th_voiced", "schwa_reduction"], "tolerances": []},
+    {"id": "p08", "text": "Why would we waste a whole week on one view?", "targets": ["w_to_v", "v_to_w", "h_to_x"], "tolerances": []},
+    {"id": "p09", "text": "I'm sending the wrong thing to the testing team.", "targets": ["ng_to_n", "ng_plus_stop", "th_voiceless"], "tolerances": ["weak_forms"]},
+    {"id": "p10", "text": "She's been singing and working all morning long.", "targets": ["ng_to_n", "ng_plus_stop", "nurse_vowel"], "tolerances": ["cot_caught"]},
+    {"id": "p11", "text": "The dog had a bad leg and a big bed.", "targets": ["final_devoicing", "ae_to_eh"], "tolerances": ["cot_caught"]},
+    {"id": "p12", "text": "Please leave the keys in the bag on the side.", "targets": ["final_devoicing", "long_i", "ae_to_eh"], "tolerances": []},
+    {"id": "p13", "text": "Please sit in this seat and fill in these six fields.", "targets": ["short_i", "long_i", "final_devoicing"], "tolerances": []},
+    {"id": "p14", "text": "It's easy to miss a meeting in a busy week.", "targets": ["short_i", "long_i"], "tolerances": ["flap_t", "weak_forms"]},
+    {"id": "p15", "text": "The man in the black hat had a bad plan.", "targets": ["ae_to_eh", "h_to_x", "final_devoicing"], "tolerances": ["final_t_unreleased"]},
+    {"id": "p16", "text": "Ten men sat at the back and had a snack.", "targets": ["ae_to_eh"], "tolerances": ["final_t_unreleased"]},
+    {"id": "p17", "text": "We can probably support another customer today.", "targets": ["schwa_reduction", "th_voiced"], "tolerances": ["weak_forms"]},
+    {"id": "p18", "text": "The red car turned right around the corner.", "targets": ["r_trill", "r_dropped", "nurse_vowel"], "tolerances": []},
+    {"id": "p19", "text": "Her first report was rarely wrong or late.", "targets": ["r_trill", "nurse_vowel", "ng_to_n"], "tolerances": []},
+    {"id": "p20", "text": "He has to help her hold the heavy box.", "targets": ["h_to_x", "o_diphthong"], "tolerances": ["weak_forms"]},
+    {"id": "p21", "text": "You should put the blue book in the room.", "targets": ["short_u", "long_u"], "tolerances": []},
+    {"id": "p22", "text": "Her first word at work was a third-person verb.", "targets": ["nurse_vowel", "w_to_v", "v_to_w", "th_voiceless"], "tolerances": []},
+    {"id": "p23", "text": "Don't go home alone. Show me the old road.", "targets": ["o_diphthong", "r_trill", "h_to_x"], "tolerances": []},
+    {"id": "p24", "text": "A little bit of butter makes it a lot better.", "targets": ["short_i"], "tolerances": ["flap_t", "final_t_unreleased"]},
+    {"id": "p25", "text": "Is there anything worth watching on TV this evening?", "targets": ["th_voiced", "th_voiceless", "w_to_v", "ng_to_n", "long_i"], "tolerances": []},
+    {"id": "p26", "text": "We were waiting for the vendor's invoice the whole week.", "targets": ["w_to_v", "v_to_w", "h_to_x", "nurse_vowel"], "tolerances": ["flap_t"]}
+  ]
+}
