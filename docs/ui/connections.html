@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>API-подключения</title>
+<!-- Макет-образец. В приложении шрифты лежат локально в web/fonts, внешних ссылок быть не должно. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F54C8}a:hover{color:#1E3A94}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; display: flex; flex-direction: column; background: #F5F6F6; color: #15181A; font-family: 'Inter', system-ui, sans-serif; font-size: 15px; line-height: 1.5">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 10px 24px; background: #FFFFFF; border-bottom: 1px solid #DFE2E3">
+<nav aria-label="Разделы" style="display: flex; gap: 4px">
+<a href="main.html" style="padding: 8px 14px; border-radius: 8px; color: #5A6166; font-weight: 500; text-decoration: none">Разговор</a>
+<a href="reading.html" style="padding: 8px 14px; border-radius: 8px; color: #5A6166; font-weight: 500; text-decoration: none">Чтение</a>
+<a href="summary.html" style="padding: 8px 14px; border-radius: 8px; color: #5A6166; font-weight: 500; text-decoration: none">Итоги</a>
+</nav>
+<div style="flex-grow: 1"></div>
+<a href="connections.html" style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid #DFE2E3; border-radius: 8px; color: #15181A; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; text-decoration: none">
+<span aria-hidden="true" style="width: 8px; height: 8px; border-radius: 50%; background: #2F54C8"></span>
+<span>DeepSeek · deepseek-flash</span>
+</a>
+<a href="connections.html" aria-label="Настройки" aria-current="page" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; background: #ECEFF0; color: #15181A">
+<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle></svg>
+</a>
+</header>
+
+<div style="flex-grow: 1; display: flex; flex-wrap: wrap; gap: 24px 40px; padding: 32px 24px; max-width: 1180px; width: 100%; box-sizing: border-box; margin: 0 auto">
+
+<nav aria-label="Настройки" style="flex: 1 1 180px; max-width: 220px; display: flex; flex-direction: column; gap: 2px">
+<div style="padding: 0 12px 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #5A6166">Настройки</div>
+<a href="connections.html" aria-current="page" style="padding: 8px 12px; border-radius: 8px; background: #ECEFF0; color: #15181A; font-weight: 600; text-decoration: none">API-подключения</a>
+<a href="connections.html" style="padding: 8px 12px; border-radius: 8px; color: #5A6166; text-decoration: none">Звук и голос</a>
+<a href="connections.html" style="padding: 8px 12px; border-radius: 8px; color: #5A6166; text-decoration: none">Разговор</a>
+<a href="connections.html" style="padding: 8px 12px; border-radius: 8px; color: #5A6166; text-decoration: none">Правки</a>
+<a href="connections.html" style="padding: 8px 12px; border-radius: 8px; color: #5A6166; text-decoration: none">Данные</a>
+</nav>
+
+<main style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 24px; font-weight: 600; line-height: 1.25">API-подключения</h1>
+<p style="margin: 0; color: #5A6166">Активно одно подключение. Переключение действует со следующей реплики.</p>
+</div>
+
+<div style="overflow-x: auto; border: 1px solid #DFE2E3; border-radius: 12px; background: #FFFFFF">
+<table style="width: 100%; min-width: 820px; border-collapse: collapse; font-size: 14px">
+<thead>
+<tr>
+<th scope="col" style="width: 56px; padding: 10px 12px 10px 16px; text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #5A6166">Акт.</th>
+<th scope="col" style="padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #5A6166">Название</th>
+<th scope="col" style="padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #5A6166">Адрес</th>
+<th scope="col" style="padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #5A6166">Модель</th>
+<th scope="col" style="padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #5A6166">Ключ</th>
+<th scope="col" style="padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: #5A6166">Проверка</th>
+<th scope="col" style="width: 150px; padding: 10px 16px 10px 12px"><span style="position: absolute; width: 1px; height: 1px; overflow: hidden">Действия</span></th>
+</tr>
+</thead>
+<tbody>
+<tr style="border-top: 1px solid #ECEFF0">
+<td style="padding: 12px 12px 12px 16px">
+<button type="button" aria-pressed="true" aria-label="Активное подключение" style="display: flex; align-items: center; justify-content: center; width: 22px; height: 22px; padding: 0; border: 2px solid #2F54C8; border-radius: 50%; background: #FFFFFF"><span aria-hidden="true" style="width: 10px; height: 10px; border-radius: 50%; background: #2F54C8"></span></button>
+</td>
+<td style="padding: 12px"><div style="display: flex; flex-direction: column"><span style="font-weight: 600">DeepSeek основной</span><span style="font-size: 12px; color: #2F54C8">активно</span></div></td>
+<td style="padding: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">https://api.deepseek.com</td>
+<td style="padding: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">deepseek-flash</td>
+<td style="padding: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #5A6166">••••a1b2</td>
+<td style="padding: 12px">
+<span style="display: flex; align-items: center; gap: 6px; color: #2F54C8; white-space: nowrap">
+<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 8.5l3.2 3.2L13 5"></path></svg>
+<span>420 мс</span>
+</span>
+</td>
+<td style="padding: 12px 16px 12px 12px">
+<div style="display: flex; justify-content: flex-end; gap: 4px">
+<button type="button" style="padding: 6px 10px; border: 1px solid #DFE2E3; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 13px">Проверить</button>
+<button type="button" aria-label="Изменить или удалить: DeepSeek основной" style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: none; color: #5A6166"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>
+</div>
+</td>
+</tr>
+<tr style="border-top: 1px solid #ECEFF0">
+<td style="padding: 12px 12px 12px 16px">
+<button type="button" aria-pressed="false" aria-label="Сделать активным: DeepSeek Pro" style="display: flex; width: 22px; height: 22px; padding: 0; border: 2px solid #8A9196; border-radius: 50%; background: #FFFFFF"></button>
+</td>
+<td style="padding: 12px; font-weight: 600">DeepSeek Pro</td>
+<td style="padding: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">https://api.deepseek.com</td>
+<td style="padding: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">deepseek-v4-pro</td>
+<td style="padding: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #5A6166">••••a1b2</td>
+<td style="padding: 12px">
+<span style="display: flex; align-items: center; gap: 6px; color: #2F54C8; white-space: nowrap">
+<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M3 8.5l3.2 3.2L13 5"></path></svg>
+<span>610 мс</span>
+</span>
+</td>
+<td style="padding: 12px 16px 12px 12px">
+<div style="display: flex; justify-content: flex-end; gap: 4px">
+<button type="button" style="padding: 6px 10px; border: 1px solid #DFE2E3; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 13px">Проверить</button>
+<button type="button" aria-label="Изменить или удалить: DeepSeek Pro" style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: none; color: #5A6166"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>
+</div>
+</td>
+</tr>
+<tr style="border-top: 1px solid #ECEFF0">
+<td style="padding: 12px 12px 12px 16px">
+<button type="button" aria-pressed="false" aria-label="Сделать активным: Запасной" style="display: flex; width: 22px; height: 22px; padding: 0; border: 2px solid #8A9196; border-radius: 50%; background: #FFFFFF"></button>
+</td>
+<td style="padding: 12px; font-weight: 600">Запасной</td>
+<td style="padding: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">https://api.example.com/v1</td>
+<td style="padding: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">[МОДЕЛЬ]</td>
+<td style="padding: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #5A6166">••••9f3c</td>
+<td style="padding: 12px">
+<span style="display: flex; align-items: center; gap: 6px; color: #8F3F06; white-space: nowrap">
+<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M4 4l8 8M12 4l-8 8"></path></svg>
+<span>401: ключ отклонён</span>
+</span>
+</td>
+<td style="padding: 12px 16px 12px 12px">
+<div style="display: flex; justify-content: flex-end; gap: 4px">
+<button type="button" style="padding: 6px 10px; border: 1px solid #DFE2E3; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 13px">Проверить</button>
+<button type="button" aria-label="Изменить или удалить: Запасной" style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: none; color: #5A6166"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" style="fill: currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<section aria-label="Новое подключение" style="display: flex; flex-direction: column; gap: 16px; padding: 20px; border: 1px solid #2F54C8; border-radius: 12px; background: #FFFFFF">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Новое подключение</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 14px 16px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="conn-name" style="font-size: 13px; font-weight: 500; color: #3D4449">Название</label>
+<input id="conn-name" type="text" placeholder="Например, «DeepSeek запасной»" style="padding: 9px 12px; border: 1px solid #C9CED1; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 14px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="conn-template" style="font-size: 13px; font-weight: 500; color: #3D4449">Шаблон</label>
+<select id="conn-template" style="padding: 9px 12px; border: 1px solid #C9CED1; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 14px">
+<option>DeepSeek</option>
+<option>Другой OpenAI-совместимый</option>
+</select>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="conn-url" style="font-size: 13px; font-weight: 500; color: #3D4449">Адрес</label>
+<input id="conn-url" type="url" placeholder="https://api.deepseek.com" style="padding: 9px 12px; border: 1px solid #C9CED1; border-radius: 8px; background: #FFFFFF; color: #15181A; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="conn-model" style="font-size: 13px; font-weight: 500; color: #3D4449">Модель</label>
+<input id="conn-model" type="text" placeholder="deepseek-flash" style="padding: 9px 12px; border: 1px solid #C9CED1; border-radius: 8px; background: #FFFFFF; color: #15181A; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="conn-key" style="font-size: 13px; font-weight: 500; color: #3D4449">Ключ API</label>
+<input id="conn-key" type="password" placeholder="Вставьте ключ" autocomplete="off" style="padding: 9px 12px; border: 1px solid #C9CED1; border-radius: 8px; background: #FFFFFF; color: #15181A; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="conn-extra" style="font-size: 13px; font-weight: 500; color: #3D4449">Доп. параметры, JSON (необязательно)</label>
+<input id="conn-extra" type="text" placeholder="{ }" style="padding: 9px 12px; border: 1px solid #C9CED1; border-radius: 8px; background: #FFFFFF; color: #15181A; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">
+</div>
+</div>
+<div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<button type="button" style="padding: 9px 16px; border: 0; border-radius: 8px; background: #2F54C8; color: #FFFFFF; font: inherit; font-size: 14px; font-weight: 600">Сохранить</button>
+<button type="button" style="padding: 9px 16px; border: 1px solid #DFE2E3; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 14px">Проверить</button>
+<button type="button" style="padding: 9px 12px; border: 0; border-radius: 8px; background: none; color: #5A6166; font: inherit; font-size: 14px">Отмена</button>
+</div>
+</section>
+
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px">
+<button type="button" style="display: flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px dashed #8A9196; border-radius: 8px; background: none; color: #15181A; font: inherit; font-size: 14px; font-weight: 500">
+<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round"><path d="M8 3v10M3 8h10"></path></svg>
+<span>Добавить подключение</span>
+</button>
+<p style="margin: 0; font-size: 13px; color: #5A6166">Ключи хранятся в Диспетчере учётных данных Windows. Здесь видны только последние 4 символа.</p>
+</div>
+
+</main>
+</div>
+
+</div>
+</body>
+</html>

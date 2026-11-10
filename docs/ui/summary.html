@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Итоги сессии</title>
+<!-- Макет-образец. В приложении шрифты лежат локально в web/fonts, внешних ссылок быть не должно. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap">
+<style>
+body{margin:0}
+a{color:#2F54C8}a:hover{color:#1E3A94}
+</style>
+</head>
+<body>
+<div style="min-height: 100vh; display: flex; flex-direction: column; background: #F5F6F6; color: #15181A; font-family: 'Inter', system-ui, sans-serif; font-size: 15px; line-height: 1.5">
+
+<header style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 10px 24px; background: #FFFFFF; border-bottom: 1px solid #DFE2E3">
+<nav aria-label="Разделы" style="display: flex; gap: 4px">
+<a href="main.html" style="padding: 8px 14px; border-radius: 8px; color: #5A6166; font-weight: 500; text-decoration: none">Разговор</a>
+<a href="reading.html" style="padding: 8px 14px; border-radius: 8px; color: #5A6166; font-weight: 500; text-decoration: none">Чтение</a>
+<a href="summary.html" aria-current="page" style="padding: 8px 14px; border-radius: 8px; background: #ECEFF0; color: #15181A; font-weight: 600; text-decoration: none">Итоги</a>
+</nav>
+<div style="flex-grow: 1"></div>
+<a href="connections.html" aria-label="Настройки" style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; color: #5A6166">
+<svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle></svg>
+</a>
+</header>
+
+<main style="flex-grow: 1; display: flex; justify-content: center; padding: 32px 24px 40px">
+<div style="width: 100%; max-width: 860px; display: flex; flex-direction: column; gap: 24px">
+
+<div style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<h1 style="margin: 0; font-size: 24px; font-weight: 600; line-height: 1.25">Итоги сессии</h1>
+<p style="margin: 0; color: #5A6166">Собеседование: backend-разработчик · 9 минут · 14 реплик</p>
+</div>
+<div style="display: flex; gap: 8px">
+<button type="button" style="padding: 9px 14px; border: 1px solid #DFE2E3; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 14px">Экспорт</button>
+<a href="main.html" style="padding: 9px 16px; border-radius: 8px; background: #2F54C8; color: #FFFFFF; font-size: 14px; font-weight: 600; text-decoration: none">Новый разговор</a>
+</div>
+</div>
+
+<section aria-label="Главный вывод" style="display: flex; flex-direction: column; gap: 14px; padding: 24px; border: 2px solid #2F54C8; border-radius: 12px; background: #FFFFFF">
+<div style="font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: #2F54C8">Главный вывод</div>
+<h2 style="margin: 0; font-size: 20px; font-weight: 600"><span lang="en">for</span> и <span lang="en">since</span></h2>
+<p style="margin: 0; color: #3D4449; max-width: 640px">For ставится с длительностью: <span lang="en" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">for two years</span>. Since ставится с моментом начала: <span lang="en" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">since 2024</span>. В этой сессии ошибка встретилась дважды.</p>
+<div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 10px; background: #F0F3FB">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 13px; font-weight: 600; color: #3D4449">Упражнение</span>
+<span>Скажите по-английски: «Я работаю здесь три года».</span>
+</div>
+<div style="display: flex; gap: 8px">
+<button type="button" style="display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 0; border-radius: 8px; background: #2F54C8; color: #FFFFFF; font: inherit; font-size: 13px; font-weight: 600">
+<svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" style="fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round"><rect x="9" y="3" width="6" height="11" rx="3"></rect><path d="M5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
+<span>Сказать</span>
+</button>
+<button type="button" style="padding: 8px 14px; border: 1px solid #C9CED1; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 13px">Показать ответ</button>
+</div>
+</div>
+</section>
+
+<section aria-label="Правки" style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Правки</h2>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; border: 1px solid #DFE2E3; border-radius: 12px; background: #FFFFFF">
+<li style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 14px 20px">
+<span lang="en" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; color: #5A6166">since two years</span>
+<span aria-hidden="true" style="color: #5A6166">→</span>
+<span lang="en" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; color: #2F54C8">for two years</span>
+<span style="flex-basis: 100%; font-size: 14px; color: #3D4449">For ставится с длительностью, since — с моментом начала.</span>
+</li>
+<li style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 14px 20px; border-top: 1px solid #ECEFF0">
+<span lang="en" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; color: #5A6166">we was migrating</span>
+<span aria-hidden="true" style="color: #5A6166">→</span>
+<span lang="en" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; color: #2F54C8">we were migrating</span>
+<span style="flex-basis: 100%; font-size: 14px; color: #3D4449">С подлежащим we глагол to be в прошедшем времени — were.</span>
+</li>
+<li style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 14px 20px; border-top: 1px solid #ECEFF0">
+<span lang="en" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; color: #5A6166">the most hard part</span>
+<span aria-hidden="true" style="color: #5A6166">→</span>
+<span lang="en" style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500; color: #2F54C8">the hardest part</span>
+<span style="flex-basis: 100%; font-size: 14px; color: #3D4449">У коротких прилагательных превосходная степень образуется окончанием -est.</span>
+</li>
+</ul>
+</section>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 24px">
+
+<section aria-label="Повторяющиеся ошибки" style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Повторяющиеся ошибки</h2>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; border: 1px solid #DFE2E3; border-radius: 12px; background: #FFFFFF">
+<li style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px">
+<span lang="en" style="font-weight: 500">for / since</span>
+<span style="font-size: 13px; color: #8F3F06">3 сессии подряд</span>
+</li>
+<li style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-top: 1px solid #ECEFF0">
+<span lang="en" style="font-weight: 500">was / were</span>
+<span style="font-size: 13px; color: #3D4449">впервые</span>
+</li>
+<li style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-top: 1px solid #ECEFF0">
+<span style="font-weight: 500">Артикли <span lang="en">a / the</span></span>
+<span style="font-size: 13px; color: #2F54C8">закрыта: 4 сессии без повтора</span>
+</li>
+</ul>
+</section>
+
+<section aria-label="Произношение" style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Произношение</h2>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; border: 1px solid #DFE2E3; border-radius: 12px; background: #FFFFFF">
+<li style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px">
+<span style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500">/w/</span><span lang="en" style="color: #5A6166">worked, with</span></span>
+<a href="reading.html" style="font-size: 13px">Потренировать</a>
+</li>
+<li style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border-top: 1px solid #ECEFF0">
+<span style="display: flex; align-items: baseline; gap: 10px"><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 500">/θ/</span><span lang="en" style="color: #5A6166">think</span></span>
+<a href="reading.html" style="font-size: 13px">Потренировать</a>
+</li>
+</ul>
+</section>
+
+</div>
+
+<section aria-label="Слова и фразы" style="display: flex; flex-direction: column; gap: 12px">
+<h2 style="margin: 0; font-size: 16px; font-weight: 600">Слова и фразы собеседника</h2>
+<ul style="margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; border: 1px solid #DFE2E3; border-radius: 12px; background: #FFFFFF">
+<li style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 12px 16px">
+<span style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px"><span lang="en" style="font-weight: 500">walk me through</span><span style="color: #5A6166">расскажите по порядку</span></span>
+<button type="button" style="padding: 6px 10px; border: 1px solid #DFE2E3; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 13px">В словарь</button>
+</li>
+<li style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 12px 16px; border-top: 1px solid #ECEFF0">
+<span style="display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px"><span lang="en" style="font-weight: 500">a solid stretch</span><span style="color: #5A6166">солидный срок</span></span>
+<button type="button" style="padding: 6px 10px; border: 1px solid #DFE2E3; border-radius: 8px; background: #FFFFFF; color: #15181A; font: inherit; font-size: 13px">В словарь</button>
+</li>
+</ul>
+</section>
+
+</div>
+</main>
+
+</div>
+</body>
+</html>

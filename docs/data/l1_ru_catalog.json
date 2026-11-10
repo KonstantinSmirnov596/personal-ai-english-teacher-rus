@@ -1,0 +1,369 @@
+{
+  "version": 1,
+  "note": "Каталог типичных ошибок произношения русскоязычных и американские допуски. Символы записаны в обычной МФА. Перед использованием их нужно привести к словарю фонемной модели и к выводу espeak-ng en-us (пункты 0.7 и 3.1 плана): часть символов там выглядит иначе (долгота, ротические гласные, дифтонги). Поле detect: substitution — пара «ожидалось → прозвучало» ищется диагнозом; deletion — ожидаемый звук пропущен; manual — автоматически не определяется, пока этап 3 не докажет обратное, совет показывается только в справке по звуку. Пороговые значения здесь не задаются.",
+  "entries": [
+    {
+      "id": "w_to_v",
+      "expected": "w",
+      "heard": ["v"],
+      "position": "any",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 1,
+      "title_ru": "Звук /w/ прозвучал как /v/",
+      "tip_ru": "Губы округлены и вытянуты вперёд, как для «у», зубы не касаются губы. Затем губы быстро раскрываются.",
+      "examples": ["work", "we", "week", "away", "question"],
+      "pairs": [
+        {"heard": "v", "words": ["west", "vest"]},
+        {"heard": "v", "words": ["wine", "vine"]},
+        {"heard": "v", "words": ["wet", "vet"]},
+        {"heard": "v", "words": ["worse", "verse"]}
+      ]
+    },
+    {
+      "id": "v_to_w",
+      "expected": "v",
+      "heard": ["w"],
+      "position": "any",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 2,
+      "title_ru": "Звук /v/ прозвучал как /w/",
+      "tip_ru": "Верхние зубы слегка касаются нижней губы, звук идёт с голосом. Губы не округляются.",
+      "examples": ["very", "version", "every", "review", "have"],
+      "pairs": [
+        {"heard": "w", "words": ["vest", "west"]},
+        {"heard": "w", "words": ["vine", "wine"]},
+        {"heard": "w", "words": ["vet", "wet"]}
+      ]
+    },
+    {
+      "id": "th_voiceless",
+      "expected": "θ",
+      "heard": ["s", "f", "t"],
+      "position": "any",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 1,
+      "title_ru": "Звук /θ/ заменён другим",
+      "tip_ru": "Кончик языка между зубами или у края верхних зубов, воздух проходит без голоса.",
+      "examples": ["think", "three", "thanks", "both", "month"],
+      "pairs": [
+        {"heard": "s", "words": ["think", "sink"]},
+        {"heard": "s", "words": ["thick", "sick"]},
+        {"heard": "s", "words": ["path", "pass"]},
+        {"heard": "f", "words": ["three", "free"]},
+        {"heard": "f", "words": ["thin", "fin"]},
+        {"heard": "t", "words": ["thin", "tin"]},
+        {"heard": "t", "words": ["three", "tree"]}
+      ]
+    },
+    {
+      "id": "th_voiced",
+      "expected": "ð",
+      "heard": ["z", "d"],
+      "position": "any",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 1,
+      "title_ru": "Звук /ð/ заменён другим",
+      "tip_ru": "Положение языка то же, что для /θ/: кончик между зубами. Звук идёт с голосом.",
+      "examples": ["this", "the", "they", "other", "together"],
+      "pairs": [
+        {"heard": "d", "words": ["then", "den"]},
+        {"heard": "d", "words": ["they", "day"]},
+        {"heard": "d", "words": ["those", "doze"]},
+        {"heard": "z", "words": ["then", "zen"]},
+        {"heard": "z", "words": ["breathe", "breeze"]}
+      ]
+    },
+    {
+      "id": "ng_to_n",
+      "expected": "ŋ",
+      "heard": ["n"],
+      "position": "any",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 2,
+      "title_ru": "Звук /ŋ/ прозвучал как /n/",
+      "tip_ru": "Задняя часть языка прижата к мягкому нёбу, кончик языка опущен. Воздух идёт через нос.",
+      "examples": ["sing", "thing", "working", "morning", "long"],
+      "pairs": [
+        {"heard": "n", "words": ["sing", "sin"]},
+        {"heard": "n", "words": ["thing", "thin"]},
+        {"heard": "n", "words": ["wing", "win"]},
+        {"heard": "n", "words": ["rang", "ran"]}
+      ]
+    },
+    {
+      "id": "ng_plus_stop",
+      "expected": "ŋ",
+      "heard": ["ŋk", "ŋɡ"],
+      "position": "word_final",
+      "detect": "substitution",
+      "default_level": "approx",
+      "priority": 3,
+      "title_ru": "После /ŋ/ прозвучал лишний /k/ или /ɡ/",
+      "tip_ru": "Слово заканчивается носовым звуком. Не добавляйте «к» или «г» в конце.",
+      "examples": ["sing", "thing", "doing", "long"],
+      "pairs": [
+        {"heard": "ŋk", "words": ["sing", "sink"]},
+        {"heard": "ŋk", "words": ["thing", "think"]},
+        {"heard": "ŋk", "words": ["bang", "bank"]}
+      ]
+    },
+    {
+      "id": "final_devoicing",
+      "expected_map": [["b", "p"], ["d", "t"], ["ɡ", "k"], ["v", "f"], ["z", "s"], ["dʒ", "tʃ"]],
+      "position": "word_final",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 1,
+      "title_ru": "Звонкий согласный на конце слова оглушён",
+      "tip_ru": "Не оглушайте последний согласный. Гласная перед звонким согласным тянется дольше: bad длиннее, чем bat.",
+      "examples": ["bad", "bag", "leave", "keys", "side"],
+      "pairs": [
+        {"heard": "t", "words": ["bad", "bat"]},
+        {"heard": "k", "words": ["bag", "back"]},
+        {"heard": "p", "words": ["cab", "cap"]},
+        {"heard": "f", "words": ["leave", "leaf"]},
+        {"heard": "s", "words": ["eyes", "ice"]},
+        {"heard": "tʃ", "words": ["ridge", "rich"]}
+      ]
+    },
+    {
+      "id": "short_i",
+      "expected": "ɪ",
+      "heard": ["iː", "i"],
+      "position": "stressed",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 1,
+      "title_ru": "Краткий /ɪ/ прозвучал как долгий /iː/",
+      "tip_ru": "Короткий расслабленный звук, средний между «и» и «э». Губы не растягиваются.",
+      "examples": ["this", "sit", "fill", "six", "bit"],
+      "pairs": [
+        {"heard": "iː", "words": ["ship", "sheep"]},
+        {"heard": "iː", "words": ["live", "leave"]},
+        {"heard": "iː", "words": ["sit", "seat"]},
+        {"heard": "iː", "words": ["fill", "feel"]}
+      ]
+    },
+    {
+      "id": "long_i",
+      "expected": "iː",
+      "heard": ["ɪ"],
+      "position": "stressed",
+      "detect": "substitution",
+      "default_level": "approx",
+      "priority": 2,
+      "title_ru": "Долгий /iː/ прозвучал как краткий /ɪ/",
+      "tip_ru": "Долгий напряжённый звук, губы растянуты, как в улыбке.",
+      "examples": ["week", "leave", "seat", "these", "meeting"],
+      "pairs": [
+        {"heard": "ɪ", "words": ["sheep", "ship"]},
+        {"heard": "ɪ", "words": ["leave", "live"]},
+        {"heard": "ɪ", "words": ["seat", "sit"]}
+      ]
+    },
+    {
+      "id": "ae_to_eh",
+      "expected": "æ",
+      "heard": ["ɛ"],
+      "position": "stressed",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 1,
+      "title_ru": "Звук /æ/ прозвучал как /ɛ/",
+      "tip_ru": "Рот открыт шире, чем для «э»: челюсть опущена, уголки губ растянуты.",
+      "examples": ["bad", "man", "back", "plan", "black"],
+      "pairs": [
+        {"heard": "ɛ", "words": ["bad", "bed"]},
+        {"heard": "ɛ", "words": ["man", "men"]},
+        {"heard": "ɛ", "words": ["sad", "said"]},
+        {"heard": "ɛ", "words": ["pan", "pen"]}
+      ]
+    },
+    {
+      "id": "schwa_reduction",
+      "expected": "ə",
+      "heard": ["ɑ", "oʊ", "ɔ", "æ", "ʌ", "ɛ"],
+      "position": "unstressed",
+      "detect": "substitution",
+      "default_level": "approx",
+      "priority": 2,
+      "title_ru": "Безударная гласная произнесена полностью",
+      "tip_ru": "Безударная гласная короткая и нейтральная. Не произносите её как полные «а» или «о».",
+      "examples": ["about", "today", "support", "another", "customer"],
+      "pairs": []
+    },
+    {
+      "id": "r_trill",
+      "expected": "ɹ",
+      "heard": ["r", "ɾ"],
+      "position": "any",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 1,
+      "title_ru": "Звук /r/ раскатистый, как в русском",
+      "tip_ru": "Кончик языка поднят и слегка загнут назад, нёба не касается и не вибрирует. Губы чуть округлены.",
+      "examples": ["red", "right", "around", "report", "rarely"],
+      "pairs": []
+    },
+    {
+      "id": "r_dropped",
+      "expected": "ɹ",
+      "heard": [],
+      "position": "after_vowel",
+      "detect": "deletion",
+      "default_level": "approx",
+      "priority": 3,
+      "title_ru": "Звук /r/ после гласной пропущен",
+      "tip_ru": "Это британский вариант. В американском произношении /r/ после гласной звучит: car, mother.",
+      "examples": ["car", "corner", "mother", "first", "report"],
+      "pairs": []
+    },
+    {
+      "id": "h_to_x",
+      "expected": "h",
+      "heard": ["x"],
+      "position": "any",
+      "detect": "substitution",
+      "default_level": "approx",
+      "priority": 2,
+      "title_ru": "Звук /h/ прозвучал как русское «х»",
+      "tip_ru": "Лёгкий выдох без шума в горле, язык лежит свободно. Русское «х» звучит резче.",
+      "examples": ["he", "has", "help", "hold", "heavy", "behind"],
+      "pairs": []
+    },
+    {
+      "id": "short_u",
+      "expected": "ʊ",
+      "heard": ["uː", "u"],
+      "position": "stressed",
+      "detect": "substitution",
+      "default_level": "approx",
+      "priority": 3,
+      "title_ru": "Краткий /ʊ/ прозвучал как долгий /uː/",
+      "tip_ru": "Короткий расслабленный звук, губы округлены слабо.",
+      "examples": ["book", "put", "should", "look", "good"],
+      "pairs": [
+        {"heard": "uː", "words": ["full", "fool"]},
+        {"heard": "uː", "words": ["pull", "pool"]},
+        {"heard": "uː", "words": ["look", "Luke"]}
+      ]
+    },
+    {
+      "id": "long_u",
+      "expected": "uː",
+      "heard": ["ʊ"],
+      "position": "stressed",
+      "detect": "substitution",
+      "default_level": "approx",
+      "priority": 3,
+      "title_ru": "Долгий /uː/ прозвучал как краткий /ʊ/",
+      "tip_ru": "Долгий напряжённый звук, губы сильно округлены.",
+      "examples": ["blue", "room", "you", "food", "school"],
+      "pairs": [
+        {"heard": "ʊ", "words": ["fool", "full"]},
+        {"heard": "ʊ", "words": ["pool", "pull"]}
+      ]
+    },
+    {
+      "id": "nurse_vowel",
+      "expected": "ɝ",
+      "heard": ["ɔ", "oʊ", "ɛ", "ɑ"],
+      "position": "stressed",
+      "detect": "substitution",
+      "default_level": "error",
+      "priority": 1,
+      "title_ru": "Гласная в словах типа work, first заменена другой",
+      "tip_ru": "Это одна гласная с окраской /r/: язык оттянут назад и приподнят, губы слегка округлены. Не «ор» и не «ёр».",
+      "examples": ["work", "first", "word", "her", "learn", "third"],
+      "pairs": [
+        {"heard": "ɔ", "words": ["work", "walk"]},
+        {"heard": "ɔ", "words": ["word", "ward"]},
+        {"heard": "ɔ", "words": ["bird", "board"]},
+        {"heard": "ɑ", "words": ["heard", "hard"]}
+      ]
+    },
+    {
+      "id": "o_diphthong",
+      "expected": "oʊ",
+      "heard": ["ɔ", "o"],
+      "position": "stressed",
+      "detect": "substitution",
+      "default_level": "approx",
+      "priority": 3,
+      "title_ru": "Дифтонг /oʊ/ прозвучал как одна гласная",
+      "tip_ru": "Это двойной звук: начинается с «о» и скользит к короткому «у».",
+      "examples": ["go", "home", "don't", "show", "old", "road"],
+      "pairs": [
+        {"heard": "ɔ", "words": ["coat", "caught"]},
+        {"heard": "ɔ", "words": ["boat", "bought"]},
+        {"heard": "ɔ", "words": ["low", "law"]}
+      ]
+    },
+    {
+      "id": "palatalization",
+      "expected_map": [["t", "tʲ"], ["d", "dʲ"], ["n", "nʲ"], ["l", "lʲ"]],
+      "position": "before_front_vowel",
+      "detect": "manual",
+      "default_level": "approx",
+      "priority": 3,
+      "title_ru": "Согласный смягчён перед /i/ или /ɪ/",
+      "tip_ru": "Согласный перед /iː/ и /ɪ/ остаётся твёрдым. Не смягчайте его, как в русских «ти», «ди», «ни».",
+      "examples": ["team", "deep", "need", "little"],
+      "pairs": []
+    },
+    {
+      "id": "aspiration",
+      "expected_map": [["p", "p"], ["t", "t"], ["k", "k"]],
+      "position": "stressed_onset",
+      "detect": "manual",
+      "default_level": "approx",
+      "priority": 3,
+      "title_ru": "Нет придыхания у /p/, /t/, /k/",
+      "tip_ru": "В начале ударного слога /p/, /t/, /k/ произносятся с лёгким выдохом после звука. Без него pen слышится похожим на ben.",
+      "examples": ["pen", "time", "keys", "people", "team"],
+      "pairs": []
+    }
+  ],
+  "tolerances": [
+    {
+      "id": "flap_t",
+      "sounds": ["t", "d", "ɾ"],
+      "context": "между гласными, когда следующий слог безударный",
+      "rule": "Любой из трёх звуков считается верным.",
+      "examples": ["water", "better", "city", "little", "butter"]
+    },
+    {
+      "id": "cot_caught",
+      "sounds": ["ɑ", "ɔ"],
+      "context": "любой",
+      "rule": "Гласные взаимозаменяемы: у многих американцев они совпадают.",
+      "examples": ["cot", "caught", "lot", "thought", "long"]
+    },
+    {
+      "id": "final_t_unreleased",
+      "sounds": ["t", "ʔ"],
+      "context": "конец слова перед согласным или паузой",
+      "rule": "Нераскрытый или гортанный вариант /t/ считается верным; пропуск звука в этой позиции даёт не выше уровня «неточно».",
+      "examples": ["what", "not", "that", "right"]
+    },
+    {
+      "id": "weak_forms",
+      "sounds": [],
+      "context": "служебные слова: to, and, can, of, for, the, a",
+      "rule": "Принимаются и полная, и ослабленная форма слова.",
+      "examples": ["to", "and", "can", "of", "for"]
+    },
+    {
+      "id": "weak_vowel",
+      "sounds": ["ɪ", "ə"],
+      "context": "безударный слог",
+      "rule": "Гласные взаимозаменяемы в безударной позиции.",
+      "examples": ["wanted", "roses", "business", "minute"]
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+# окружение и кэш
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+node_modules/
+# данные приложения и модели не хранятся в репозитории
+/data/
+/models/
+/logs/
+*.db
+*.db-wal
+*.db-shm
+# артефакты тестов
+tests/fixtures/audio/generated/
+playwright-report/
+test-results/
+# локальные настройки Claude Code и секреты
+.claude/settings.local.json
+CLAUDE.local.md
+.env
+.env.*
+
+# project-local tools (uv bootstrap)
+.tools/
