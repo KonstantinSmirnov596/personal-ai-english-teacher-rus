@@ -2,9 +2,16 @@
 
 from __future__ import annotations
 
+import contextlib
 import os
+import secrets
 import tempfile
+from collections.abc import Iterator
 from pathlib import Path
+
+import keyring
+import keyring.errors
+import pytest
 
 from trainer import paths
 
@@ -14,3 +21,30 @@ os.environ.setdefault("TRAINER_MODELS_DIR", str(_REAL_MODELS))
 os.environ["TRAINER_DATA_DIR"] = str(Path(tempfile.mkdtemp(prefix="trainer-test-data-")))
 os.environ["TRAINER_KEYRING_SERVICE"] = "EnglishTrainer-test"
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
+
+from tests.mock_llm import MockLLM  # noqa: E402  (after the environment is isolated)
+
+
+@pytest.fixture
+def test_key() -> str:
+    return "sk-test-" + secrets.token_urlsafe(24)
+
+
+@pytest.fixture
+def mock_llm(test_key: str) -> Iterator[MockLLM]:
+    mock = MockLLM(test_key).start()
+    try:
+        yield mock
+    finally:
+        mock.stop()
+
+
+@pytest.fixture(autouse=True)
+def _clean_test_keyring() -> Iterator[None]:
+    """Remove every key the test stored in the EnglishTrainer-test service."""
+    yield
+    service = os.environ["TRAINER_KEYRING_SERVICE"]
+    assert service == "EnglishTrainer-test"
+    for i in range(1, 11):
+        with contextlib.suppress(keyring.errors.PasswordDeleteError):
+            keyring.delete_password(service, f"connection-{i}")
