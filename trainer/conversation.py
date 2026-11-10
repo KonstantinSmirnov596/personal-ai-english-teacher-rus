@@ -351,7 +351,8 @@ class Conversation:
         session.history.append({"role": "user", "content": tutor_prompt.user_message(text, unsure)})
         session.last_user_turn_id = turn_id
 
-        if session.correction_mode == "off":
+        # The mode is read per turn: switching corrections off takes effect immediately.
+        if self.core.settings.get().correction_mode == "off":
             await self.send(Corrections(turn_id=turn_id, status="disabled"))
             self.core.sessions.update_turn(turn_id, corrections_status="disabled")
         else:

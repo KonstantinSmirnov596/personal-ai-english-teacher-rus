@@ -57,5 +57,10 @@ if ($SkipModels) {
     try { Invoke-Checked $VenvPython -m trainer.setup_models } finally { Pop-Location }
 }
 
+# 5. Window fonts (Inter, JetBrains Mono) into web\fonts.
+Write-Step 'fonts -> web\fonts'
+Push-Location $RepoRoot
+try { Invoke-Checked $VenvPython -m trainer.setup_fonts } finally { Pop-Location }
+
 Write-Host 'setup: OK' -ForegroundColor Green
 exit 0

@@ -1,1 +1,23 @@
-:root {}
+/* Design tokens (docs/ui/README.md). No colors outside this list. */
+:root {
+  --ground: #F5F6F6;
+  --surface: #FFFFFF;
+  --surface-2: #ECEFF0;
+  --ink: #15181A;
+  --ink-2: #3D4449;
+  --muted: #5A6166;
+  --faint: #8A9196;
+  --line: #DFE2E3;
+  --line-strong: #C9CED1;
+  --accent: #2F54C8;
+  --accent-hover: #1E3A94;
+  --accent-soft: #F0F3FB;
+  --pron: #8F3F06;
+  --pron-soft: #FBE3CC;
+
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --radius-control: 8px;
+  --radius-card: 12px;
+  --feed-width: 760px;
+}

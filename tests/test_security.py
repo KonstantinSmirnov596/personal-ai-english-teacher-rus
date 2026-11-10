@@ -140,6 +140,8 @@ def test_second_websocket_replaces_first(tmp_path: Path) -> None:
 
 
 _URL = re.compile(r"https?://")
+# The SVG namespace is an identifier required by standalone SVG files, never fetched.
+_SVG_NS = "http://www.w3.org/2000/svg"
 
 
 def test_web_files_have_no_external_urls() -> None:
@@ -151,9 +153,11 @@ def test_web_files_have_no_external_urls() -> None:
             ".js",
             ".mjs",
             ".json",
+            ".svg",
         }:
             continue
         for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
-            if _URL.search(line) and "license" not in line.lower():
+            stripped = line.replace(f'xmlns="{_SVG_NS}"', "")
+            if _URL.search(stripped) and "license" not in line.lower():
                 offenders.append(f"{path.relative_to(WEB)}:{lineno}")
     assert not offenders
