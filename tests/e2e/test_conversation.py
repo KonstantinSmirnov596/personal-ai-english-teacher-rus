@@ -159,3 +159,15 @@ def test_connection_failure_offers_manual_switch(e2e: E2E) -> None:
     with e2e.http() as c:
         active = next(r for r in c.get("/api/connections").json() if r["is_active"])
         assert active["id"] == good["id"]
+
+
+def test_history_lists_sessions(e2e: E2E) -> None:
+    page = e2e.new_page()
+    page.goto(e2e.lp.base + "/#/history")
+    rows = page.locator("[data-testid=session-row]")
+    rows.first.wait_for(timeout=10_000)
+    assert rows.count() >= 2
+    rows.first.locator("a").first.click()
+    page.locator("article.turn").first.wait_for(timeout=10_000)
+    assert page.locator("article.turn.tutor").count() >= 1
+    e2e.screenshot("06-history")
