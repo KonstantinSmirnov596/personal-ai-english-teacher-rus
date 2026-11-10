@@ -40,9 +40,14 @@ def mock_llm(test_key: str) -> Iterator[MockLLM]:
 
 
 @pytest.fixture(autouse=True)
-def _clean_test_keyring() -> Iterator[None]:
-    """Remove every key the test stored in the EnglishTrainer-test service."""
+def _clean_test_keyring(request: pytest.FixtureRequest) -> Iterator[None]:
+    """Remove every key the test stored in the EnglishTrainer-test service.
+
+    GPU and e2e modules share one running core per module and clean up their own keys.
+    """
     yield
+    if request.node.get_closest_marker("gpu") or request.node.get_closest_marker("e2e"):
+        return
     service = os.environ["TRAINER_KEYRING_SERVICE"]
     assert service == "EnglishTrainer-test"
     for i in range(1, 11):

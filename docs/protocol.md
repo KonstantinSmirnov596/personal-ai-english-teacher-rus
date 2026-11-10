@@ -41,6 +41,7 @@
 | `turn.begin` | `turn_id`, `mode: "manual" \| "auto"` | Окно начало запись. Если ядро в состоянии `thinking` или `speaking`, это равносильно `interrupt` |
 | `turn.audio` | `turn_id`, `audio: {sample_rate, format: "pcm_s16le", bytes}` + двоичный кадр | Реплика целиком. Частота от 16000 до 48000; ядро само приводит её к 16 кГц |
 | `turn.cancel` | `turn_id` | Запись отменена (Esc). Ядро возвращается в `idle` |
+| `turn.retry` | `turn_id` | Повторить ответ собеседника на реплику после ошибки LLM (кнопки «Повторить» и «Переключить на…»). Реплика уже в истории, заново она не распознаётся |
 | `interrupt` | — | Оборвать текущий ответ: закрыть поток LLM, очистить очередь синтеза. Запрос корректора не отменяется |
 | `playback.started` | `turn_id`, `client_first_audio_ms` | Окно начало воспроизводить ответ. Число — время от отправки `turn.audio` до первого звука по часам окна |
 | `playback.ended` | `turn_id`, `interrupted: bool` | Очередь воспроизведения пуста. Ядро переходит в `idle` |
@@ -56,7 +57,7 @@
 
 | `type` | Поля | Смысл |
 | --- | --- | --- |
-| `hello` | `protocol: 1`, `app_version`, `state`, `active_connection: {id, name, model} \| null`, `settings` | Первое сообщение после подключения |
+| `hello` | `protocol: 1`, `app_version`, `state`, `active_connection: {id, name, model} \| null`, `settings`, `models_ready: bool` | Первое сообщение после подключения. `models_ready` ложно, пока модели распознавания и синтеза загружаются |
 | `session.started` | `session_id`, `scenario: {id, title_ru}`, `connection: {id, name, model}` | Сессия открыта |
 | `state` | `value: "idle" \| "listening" \| "transcribing" \| "thinking" \| "speaking"`, `turn_id?` | Каждая смена состояния ядра |
 | `user.transcript` | `turn_id`, `text`, `words: [{w, start, end, p}]`, `low_conf: [индексы слов]` | Текст реплики. `p` — уверенность слова от 0 до 1; `low_conf` — слова ниже порога |

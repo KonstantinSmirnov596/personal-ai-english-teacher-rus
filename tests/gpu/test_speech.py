@@ -25,7 +25,7 @@ def models() -> tuple[SpeechRecognizer, SpeechSynthesizer]:
     return stt, tts
 
 
-def test_queue_runs_jobs_sequentially(models) -> None:  # noqa: ANN001
+def test_queue_runs_jobs_sequentially(models) -> None:
     stt, tts = models
     queue = GpuQueue()
 
@@ -39,10 +39,12 @@ def test_queue_runs_jobs_sequentially(models) -> None:  # noqa: ANN001
 
     heard = asyncio.run(scenario())
     queue.shutdown()
-    assert wer(["The meeting starts at nine.", "Could you share your screen, please?"], heard) <= 0.1
+    assert (
+        wer(["The meeting starts at nine.", "Could you share your screen, please?"], heard) <= 0.1
+    )
 
 
-def test_input_resampled_from_48k(models) -> None:  # noqa: ANN001
+def test_input_resampled_from_48k(models) -> None:
     stt, tts = models
     syn = tts.synthesize("I usually work from home on Fridays.")
     audio48 = resample(syn.audio, TTS_RATE, 48_000)
@@ -50,7 +52,7 @@ def test_input_resampled_from_48k(models) -> None:  # noqa: ANN001
     assert wer(["I usually work from home on Fridays."], [tr.text]) <= 0.1
 
 
-def test_synthesis_rejects_cyrillic(models) -> None:  # noqa: ANN001
+def test_synthesis_rejects_cyrillic(models) -> None:
     _stt, tts = models
     with pytest.raises(CyrillicTextError):
         tts.synthesize("Привет, это проверка.")
@@ -58,7 +60,7 @@ def test_synthesis_rejects_cyrillic(models) -> None:  # noqa: ANN001
         tts.synthesize("Hello, мир.")
 
 
-def test_silence_gives_empty_transcript(models) -> None:  # noqa: ANN001
+def test_silence_gives_empty_transcript(models) -> None:
     stt, _tts = models
     tr = stt.transcribe(np.zeros(STT_RATE * 3, dtype=np.float32))
     assert tr.text == ""
