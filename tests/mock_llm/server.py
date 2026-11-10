@@ -202,6 +202,7 @@ class MockLLM:
             log_config=None,
             access_log=False,
             lifespan="off",
+            timeout_graceful_shutdown=1,
         )
         self.server = uvicorn.Server(config)
         self.thread = threading.Thread(target=self.server.run, daemon=True)
