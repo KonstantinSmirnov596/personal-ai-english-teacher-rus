@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "note": "Speech fixtures synthesized by Kokoro (tests/fixtures/make_fixtures.py). Output: 48 kHz mono PCM16 WAV in tests/fixtures/audio/generated/.",
+  "loop": {
+    "voice": "af_heart",
+    "phrases": [
+      "Good morning, how was your weekend?",
+      "I usually take the train to work because the traffic is terrible.",
+      "Could you send me the report before the meeting on Thursday?",
+      "We decided to move the launch to next month.",
+      "My favorite part of the job is talking to customers and solving their problems.",
+      "The weather was so nice that we spent the whole afternoon in the park.",
+      "I think we should hire two more engineers for the mobile team.",
+      "Honestly, I am not sure the new design works for older users, so let's run a quick test first.",
+      "She has been learning to play the guitar for three years.",
+      "Let me check my calendar and get back to you this afternoon."
+    ]
+  },
+  "bench": {
+    "voice": "af_heart",
+    "phrase_5s": "I have worked on this project for two years and I really enjoy it.",
+    "phrase_10s": "Last week our team finished the new payment feature, and now we are testing it with a small group of customers before the big release next month.",
+    "tutor_first_sentence": "That sounds like a really interesting project, so what part of it do you enjoy the most?"
+  },
+  "turns": {
+    "turn_basic": {
+      "voice": "af_heart",
+      "segments": [
+        {"say": "I have worked on this project since two years."},
+        {"silence_s": 5.0}
+      ]
+    },
+    "turn_pause_1200": {
+      "voice": "af_heart",
+      "segments": [
+        {"say": "I would like to talk about my new job."},
+        {"silence_s": 1.2},
+        {"say": "It is a lot more interesting than the old one."},
+        {"silence_s": 5.0}
+      ]
+    },
+    "too_short": {
+      "voice": "af_heart",
+      "segments": [
+        {"say": "Hi.", "max_s": 0.2}
+      ]
+    },
+    "silence_5s": {
+      "segments": [
+        {"silence_s": 5.0}
+      ]
+    },
+    "noise_5s": {
+      "segments": [
+        {"pink_noise_s": 5.0, "level_db": -35.0}
+      ]
+    }
+  }
+}

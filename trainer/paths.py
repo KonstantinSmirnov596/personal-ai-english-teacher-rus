@@ -38,4 +38,6 @@ def configure_model_env() -> Path:
     os.environ["HF_HOME"] = str(models)
     os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1")
     os.environ.setdefault("HF_HUB_DISABLE_PROGRESS_BARS", "1")
+    # Windows without Developer Mode cannot create symlinks; the cache then copies files.
+    os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")
     return models
