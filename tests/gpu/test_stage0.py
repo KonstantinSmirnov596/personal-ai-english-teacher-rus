@@ -33,3 +33,18 @@ def test_tts_stt_loop_wer() -> None:
     print(f"loop WER: {rate:.3f}")
     assert len(refs) == 10
     assert rate <= 0.10, list(zip(refs, hyps, strict=True))
+
+
+def test_word_probabilities_present() -> None:
+    """Item 0.5: faster-whisper returns a probability per word with word_timestamps=True."""
+    from tests.fixtures.make_fixtures import ensure_loop
+    from trainer.speech.audio import STT_RATE, read_wav, resample
+    from trainer.speech.stt import SpeechRecognizer
+
+    path, _text = ensure_loop()[1]
+    audio, rate = read_wav(path)
+    tr = SpeechRecognizer().transcribe(resample(audio, rate, STT_RATE))
+    assert len(tr.words) >= 5
+    assert all(0.0 <= w.p <= 1.0 for w in tr.words)
+    assert all(w.end >= w.start for w in tr.words)
+    assert sum(w.p for w in tr.words) / len(tr.words) > 0.8

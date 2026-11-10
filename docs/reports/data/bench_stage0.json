@@ -1,0 +1,141 @@
+{
+  "date": "2026-11-10T22:58:13+00:00",
+  "gpu": "NVIDIA GeForce RTX 5060 Laptop GPU",
+  "torch": "2.11.0+cu128",
+  "vram_total_mb": 8151,
+  "tts": {
+    "load_ms": 11545.1,
+    "first_sentence_cold_ms": 1490.9,
+    "first_sentence_warm": {
+      "median_ms": 99.8,
+      "max_ms": 234.5,
+      "runs": 5
+    },
+    "sentence_audio_s": 5.15,
+    "sentence": "That sounds like a really interesting project, so what part of it do you enjoy the most?"
+  },
+  "stt": {
+    "load_ms": 2084.8,
+    "beam_size": 1,
+    "phrase_5s": {
+      "audio_s": 4.5,
+      "cold_ms": 818.1,
+      "warm": {
+        "median_ms": 271.4,
+        "max_ms": 273.5,
+        "runs": 5
+      },
+      "text": "I have worked on this project for almost two years, and I really enjoy it."
+    },
+    "phrase_10s": {
+      "audio_s": 10.1,
+      "cold_ms": 319.2,
+      "warm": {
+        "median_ms": 311.4,
+        "max_ms": 332.6,
+        "runs": 5
+      },
+      "text": "Last week our team finished the new payment feature, and now we are testing it with a small group of loyal customers before the big public release early next month."
+    },
+    "phrase_10s_beam5_warm": {
+      "median_ms": 367.6,
+      "max_ms": 384.4,
+      "runs": 5
+    }
+  },
+  "phoneme": {
+    "load_ms": 1477.1,
+    "phrase_5s_cold_ms": 107.5,
+    "phrase_5s_warm": {
+      "median_ms": 15.9,
+      "max_ms": 16.2,
+      "runs": 5
+    }
+  },
+  "vram_mb": {
+    "baseline_before_process": 0,
+    "cuda_context": 114,
+    "tts": 760,
+    "stt": 2154,
+    "phoneme": 372,
+    "all_loaded_device_used": 3562,
+    "all_loaded_process": 3562,
+    "torch_max_allocated": 1222
+  },
+  "loop": {
+    "wer": 0.0,
+    "phrases": 10,
+    "items": [
+      {
+        "file": "loop_01.wav",
+        "ref": "Good morning, how was your weekend?",
+        "hyp": "Good morning, how was your weekend?",
+        "errors": 0,
+        "words": 6
+      },
+      {
+        "file": "loop_02.wav",
+        "ref": "I usually take the train to work because the traffic is terrible.",
+        "hyp": "I usually take the train to work because the traffic is terrible.",
+        "errors": 0,
+        "words": 12
+      },
+      {
+        "file": "loop_03.wav",
+        "ref": "Could you send me the report before the meeting on Thursday?",
+        "hyp": "Could you send me the report before the meeting on Thursday?",
+        "errors": 0,
+        "words": 11
+      },
+      {
+        "file": "loop_04.wav",
+        "ref": "We decided to move the launch to next month.",
+        "hyp": "We decided to move the launch to next month.",
+        "errors": 0,
+        "words": 9
+      },
+      {
+        "file": "loop_05.wav",
+        "ref": "My favorite part of the job is talking to customers and solving their problems.",
+        "hyp": "My favorite part of the job is talking to customers and solving their problems.",
+        "errors": 0,
+        "words": 14
+      },
+      {
+        "file": "loop_06.wav",
+        "ref": "The weather was so nice that we spent the whole afternoon in the park.",
+        "hyp": "The weather was so nice, that we spent the whole afternoon in the park.",
+        "errors": 0,
+        "words": 14
+      },
+      {
+        "file": "loop_07.wav",
+        "ref": "I think we should hire two more engineers for the mobile team.",
+        "hyp": "I think we should hire two more engineers for the mobile team.",
+        "errors": 0,
+        "words": 12
+      },
+      {
+        "file": "loop_08.wav",
+        "ref": "Honestly, I am not sure the new design works for older users, so let's run a quick test first.",
+        "hyp": "Honestly, I am not sure the new design works for older users, so let's run a quick test first.",
+        "errors": 0,
+        "words": 19
+      },
+      {
+        "file": "loop_09.wav",
+        "ref": "She has been learning to play the guitar for three years.",
+        "hyp": "She has been learning to play the guitar for three years.",
+        "errors": 0,
+        "words": 11
+      },
+      {
+        "file": "loop_10.wav",
+        "ref": "Let me check my calendar and get back to you this afternoon.",
+        "hyp": "Let me check my calendar and get back to you this afternoon.",
+        "errors": 0,
+        "words": 12
+      }
+    ]
+  }
+}

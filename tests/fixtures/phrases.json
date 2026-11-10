@@ -18,8 +18,8 @@
   },
   "bench": {
     "voice": "af_heart",
-    "phrase_5s": "I have worked on this project for two years and I really enjoy it.",
-    "phrase_10s": "Last week our team finished the new payment feature, and now we are testing it with a small group of customers before the big release next month.",
+    "phrase_5s": "I have worked on this project for almost two years, and I really enjoy it.",
+    "phrase_10s": "Last week our team finished the new payment feature, and now we are testing it with a small group of loyal customers before the big public release early next month.",
     "tutor_first_sentence": "That sounds like a really interesting project, so what part of it do you enjoy the most?"
   },
   "turns": {
