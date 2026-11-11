@@ -89,10 +89,10 @@
     },
     "reading_p01_accent": {
       "voice": "am_michael",
-      "note": "phrase p01 with think->sink and work->verk",
+      "note": "phrase p01 with work->verk and third->serd (phoneme overrides)",
       "segments": [
         {
-          "say": "I [think](/sˈɪŋk/) we should [work](/vˈɜɹk/) on the third version this week."
+          "say": "I think we should [work](/vˈɜɹk/) on the [third](/sˈɜɹd/) version this week."
         },
         {
           "silence_s": 5.0

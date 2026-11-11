@@ -20,8 +20,10 @@ from trainer.storage.repo import new_id, now_iso
 
 log = logging.getLogger(__name__)
 
-OFFSET_STEP = 0.75  # one «Это было верно» raises the margin for that sound by this much
-OFFSET_MAX = 6.0
+# One «Это было верно» raises the margin for that sound by at least OFFSET_STEP and by half of
+# what this recording still exceeds it by, so a few presses accept even a confident mark.
+OFFSET_STEP = 1.0
+OFFSET_MAX = 12.0
 MIN_FREE_VRAM_MB = 400
 CONFIDENT_WORD_P = 0.9  # conversation: only words recognized at least this confidently
 MAX_TEXT_CHARS = 600
@@ -254,6 +256,9 @@ class PronService:
             raise PronError("not_found") from e
         was = phone["level"]
         cls = phone["cls"]
+        current = self.offsets().get(cls, 0.0)
+        excess = -float(phone.get("gop", 0.0)) - (THRESHOLDS.cat_error + current)
+        step = max(OFFSET_STEP, 0.5 * excess)
         if was != "ok":
             phone["level"] = "ok"
             phone["heard"] = phone["expected"]
@@ -277,7 +282,7 @@ class PronService:
             " ON CONFLICT(phone) DO UPDATE SET sensitivity_offset ="
             " MIN(sensitivity_offset + excluded.sensitivity_offset, ?),"
             " updated_at = excluded.updated_at",
-            (cls, OFFSET_STEP, now_iso(), OFFSET_MAX),
+            (cls, step, now_iso(), OFFSET_MAX),
         )
         offset = db.one("SELECT sensitivity_offset FROM pron_sound WHERE phone = ?", (cls,))
         details["attempt_id"] = attempt_id
