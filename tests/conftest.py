@@ -17,6 +17,7 @@ from trainer import paths
 
 # Tests share the real models directory (no re-downloads) but never touch the owner's data dir.
 _REAL_MODELS = paths.models_dir()
+REAL_DATA_DIR = paths.data_dir()  # read only by the live suite (owner's active connection)
 os.environ.setdefault("TRAINER_MODELS_DIR", str(_REAL_MODELS))
 os.environ["TRAINER_DATA_DIR"] = str(Path(tempfile.mkdtemp(prefix="trainer-test-data-")))
 os.environ["TRAINER_KEYRING_SERVICE"] = "EnglishTrainer-test"
