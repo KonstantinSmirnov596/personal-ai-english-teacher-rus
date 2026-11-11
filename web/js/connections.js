@@ -3,6 +3,7 @@
 import { ru } from '../i18n/ru.js';
 import { del, get, patch, post } from './api.js';
 import { clear, el, icons } from './dom.js';
+import { settingsNav } from './settings.js';
 
 const R = ru.connections;
 
@@ -18,10 +19,7 @@ export class ConnectionsView {
 
   render() {
     clear(this.root);
-    const nav = el('nav', { class: 'settings-nav', 'aria-label': ru.settings.title }, [
-      el('div', { class: 'settings-nav-title', text: ru.settings.title }),
-      el('a', { href: '#/settings/connections', 'aria-current': 'page', text: ru.settings.connections }),
-    ]);
+    const nav = settingsNav('connections');
     this.main = el('main', { class: 'settings-main' });
     this.root.append(nav, this.main);
     this.load();

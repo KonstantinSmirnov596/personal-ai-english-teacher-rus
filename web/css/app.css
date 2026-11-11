@@ -99,6 +99,7 @@ button:disabled { cursor: default; opacity: 0.55; }
 
 /* --- buttons & forms --------------------------------------------------------------------- */
 .btn {
+  display: inline-block; text-decoration: none; text-align: center;
   padding: 9px 16px; border: 1px solid var(--line); border-radius: var(--radius-control);
   background: var(--surface); color: var(--ink); font-size: 14px;
 }
@@ -217,3 +218,51 @@ button:disabled { cursor: default; opacity: 0.55; }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+
+/* --- summary ----------------------------------------------------------------------------- */
+.summary { display: flex; flex-direction: column; gap: 24px; }
+.summary-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.takeaway { display: flex; flex-direction: column; gap: 14px; padding: 24px; border: 2px solid var(--accent); border-radius: var(--radius-card); background: var(--surface); }
+.takeaway h2 { margin: 0; font-size: 20px; font-weight: 600; }
+.takeaway-label { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); }
+.takeaway-text { margin: 0; color: var(--ink-2); max-width: 640px; }
+.takeaway-examples { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.takeaway-examples li { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; }
+.exercise { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 10px; background: var(--accent-soft); }
+.exercise-text { display: flex; flex-direction: column; gap: 2px; }
+.exercise-label { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.exercise-result { flex-basis: 100%; min-height: 1em; }
+.btn-icon { display: flex; align-items: center; gap: 8px; }
+.btn.recording { background: var(--accent-hover); }
+.ok-text { color: var(--accent); }
+.bad-text { color: var(--pron); }
+.small { font-size: 13px; }
+.strong { font-weight: 500; }
+.summary-section { display: flex; flex-direction: column; gap: 12px; }
+.summary-section h2 { margin: 0; font-size: 16px; font-weight: 600; }
+.summary-list { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.summary-li { padding: 14px 20px; }
+.summary-li + .summary-li { border-top: 1px solid var(--surface-2); }
+.summary-li.row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 12px 16px; }
+.row-main { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 24px; }
+.state-focus { color: var(--pron); }
+.state-closed { color: var(--accent); }
+
+/* --- helpers ----------------------------------------------------------------------------- */
+.helper-card { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; border: 1px dashed var(--line-strong); border-radius: var(--radius-card); background: var(--surface); }
+.helper-card ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+.helper-title { font-size: 13px; font-weight: 600; color: var(--muted); }
+.translation { font-size: 14px; color: var(--ink-2); }
+.how-form { display: flex; flex-wrap: wrap; gap: 8px; }
+.how-form .input { flex: 1 1 260px; }
+
+/* --- vocabulary & settings ---------------------------------------------------------------- */
+.vocab-card { display: flex; flex-direction: column; gap: 10px; padding: 16px 20px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.vocab-phrase { font-size: 18px; font-weight: 500; }
+.settings-group { display: flex; flex-direction: column; gap: 16px; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius-card); background: var(--surface); }
+.check { display: flex; align-items: center; gap: 10px; }
+.range-row { display: flex; align-items: center; gap: 12px; }
+.range-row input { flex: 1 1 auto; max-width: 320px; }
+.radio-list { display: flex; flex-direction: column; gap: 8px; }
+.danger { border-color: var(--pron); color: var(--pron); }

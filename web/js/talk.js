@@ -4,6 +4,7 @@ import { ru } from '../i18n/ru.js';
 import { get, patch, post } from './api.js';
 import { clear, el, formatClock, icons, isTextField } from './dom.js';
 import { AutoTurns, floatToPcm16 } from './vad.js';
+import { renderSummary } from './summary.js';
 import { Wave } from './wave.js';
 
 const RETRYABLE_SWITCH = new Set(['llm_unauthorized', 'llm_unreachable']);
@@ -140,25 +141,91 @@ export class TalkView {
 
   renderSummary() {
     const col = clear(this.feedColumn);
-    const s = this.summary;
-    const box = el('section', { class: 'start', 'data-testid': 'summary' }, [el('h1', { text: ru.summary.title })]);
-    const items = s.corrections || [];
-    if (!items.length) box.append(el('p', { class: 'muted', text: ru.summary.none }));
-    else {
-      const card = el('div', { class: 'card', lang: 'ru' }, [el('div', { class: 'turn-label', text: ru.summary.corrections })]);
-      items.forEach((c, i) => {
-        if (i) card.append(el('div', { class: 'card-sep' }));
-        card.append(this.cardItem(c));
-      });
-      box.append(card);
+    col.append(
+      renderSummary(this.app, this.summary, this.summaryMeta, () => {
+        this.summary = null;
+        this.render();
+      }),
+    );
+  }
+
+  // --- helpers ---------------------------------------------------------------------------
+
+  helperCard(title, testid) {
+    const close = el('button', { type: 'button', class: 'link-button card-close', text: ru.helpers.close });
+    const body = el('div', { class: 'helper-body' }, [el('span', { class: 'muted', text: ru.helpers.loading })]);
+    const card = el('section', { class: 'helper-card', lang: 'ru', 'data-testid': testid }, [el('div', { class: 'helper-title', text: title }), body, close]);
+    close.addEventListener('click', () => card.remove());
+    this.feedColumn.append(card);
+    card.scrollIntoView({ block: 'end' });
+    return { card, body };
+  }
+
+  async showHint() {
+    const { body } = this.helperCard(ru.helpers.hintTitle, 'hint-card');
+    try {
+      const data = await this.app.askHelper({ type: 'helper.hint' });
+      body.replaceChildren(el('ul', {}, data.options.map((o) => el('li', { lang: 'en', text: o.en }))));
+    } catch (e) {
+      body.replaceChildren(el('span', { class: 'bad-text', text: ru.errors[e.code] || ru.errors.internal }));
     }
-    const again = el('button', { type: 'button', class: 'btn btn-primary', text: ru.summary.newSession });
-    again.addEventListener('click', () => {
-      this.summary = null;
-      this.render();
+  }
+
+  showHowToSay() {
+    const { card, body } = this.helperCard(ru.helpers.howTitle, 'how-card');
+    const input = el('input', { type: 'text', class: 'input', lang: 'ru', placeholder: ru.helpers.howPlaceholder, 'data-testid': 'how-input', maxlength: '500' });
+    const submit = el('button', { type: 'submit', class: 'btn btn-small', text: ru.helpers.howSubmit });
+    const result = el('div', { class: 'how-result' });
+    const form = el('form', { class: 'how-form' }, [input, submit]);
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      result.replaceChildren(el('span', { class: 'muted', text: ru.helpers.loading }));
+      try {
+        const data = await this.app.askHelper({ type: 'helper.how_to_say', text_ru: text });
+        result.replaceChildren(
+          el('div', { lang: 'en', class: 'strong', text: data.en }),
+          data.alt ? el('div', {}, [el('span', { class: 'muted', text: `${ru.helpers.alt}: ` }), el('span', { lang: 'en', text: data.alt })]) : '',
+          data.note_ru ? el('div', { class: 'muted small', text: data.note_ru }) : '',
+        );
+      } catch (err) {
+        result.replaceChildren(el('span', { class: 'bad-text', text: ru.errors[err.code] || ru.errors.internal }));
+      }
     });
-    box.append(el('div', { class: 'form-actions' }, [again]));
-    col.append(box);
+    body.replaceChildren(form, result);
+    card.scrollIntoView({ block: 'end' });
+    input.focus();
+  }
+
+  addTutorActions(turnId) {
+    const t = this.turns.get(turnId);
+    if (!t || !t.actions || t.actions.childElementCount) return;
+    const replay = el('button', { type: 'button', class: 'link-button', 'data-testid': 'tutor-replay', text: ru.talk.replay });
+    replay.addEventListener('click', () => this.replay(turnId, 1.0));
+    const slower = el('button', { type: 'button', class: 'link-button', 'data-testid': 'tutor-slower', text: ru.talk.slower });
+    slower.addEventListener('click', () => this.replay(turnId, 0.8));
+    const translate = el('button', { type: 'button', class: 'link-button', 'data-testid': 'tutor-translate', text: ru.talk.translate });
+    translate.addEventListener('click', async () => {
+      translate.disabled = true;
+      const out = el('div', { class: 'translation', lang: 'ru', 'data-testid': 'translation', text: ru.helpers.loading });
+      t.node.insertBefore(out, t.actions);
+      try {
+        const data = await this.app.askHelper({ type: 'helper.translate', turn_id: turnId });
+        out.textContent = data.ru;
+      } catch (e) {
+        out.textContent = ru.errors[e.code] || ru.errors.internal;
+        translate.disabled = false;
+      }
+    });
+    t.actions.append(replay, slower, translate);
+  }
+
+  replay(turnId, speed) {
+    if (this.recording) return;
+    this.app.audio.stopPlayback();
+    this.muted = false;
+    this.app.socket.send({ type: 'tutor.replay', turn_id: turnId, speed });
   }
 
   buildPanel() {
@@ -180,6 +247,10 @@ export class TalkView {
       this.toggleCorrectionMenu();
     });
     this.correctionDropdown = el('div', { class: 'dropdown' }, [this.correctionChip]);
+    const hint = el('button', { type: 'button', class: 'btn btn-small', 'data-testid': 'helper-hint', text: ru.panel.hint });
+    hint.addEventListener('click', () => this.showHint());
+    const how = el('button', { type: 'button', class: 'btn btn-small', 'data-testid': 'helper-how', text: ru.panel.howToSay });
+    how.addEventListener('click', () => this.showHowToSay());
     const finish = el('button', { type: 'button', class: 'btn btn-ghost btn-small', 'data-testid': 'end-session', text: ru.panel.finish });
     finish.addEventListener('click', () => this.endSession());
     this.panel = el('footer', { class: 'panel', 'data-testid': 'panel', 'data-state': 'idle' }, [
@@ -189,7 +260,7 @@ export class TalkView {
         el('div', { class: 'panel-row' }, [
           this.modeToggle,
           el('div', { class: 'mic-group' }, [this.micButton, this.keysNode]),
-          el('div', { class: 'helpers' }, [finish]),
+          el('div', { class: 'helpers' }, [hint, how, finish]),
         ]),
       ]),
     ]);
@@ -582,6 +653,7 @@ export class TalkView {
         t.textNode.textContent = msg.text;
         if (msg.interrupted) t.node.append(el('div', { class: 'turn-note', text: ru.talk.interrupted }));
         this.doneReplies.add(msg.turn_id);
+        if (msg.text) this.addTutorActions(msg.turn_id);
         if (!this.app.audio.playing) this.onPlaybackDrained();
         break;
       }
@@ -597,6 +669,13 @@ export class TalkView {
         this.onError(msg);
         break;
       case 'summary':
+        this.summaryMeta = this.session
+          ? {
+              title: this.session.title,
+              minutes: Math.max(1, Math.round((performance.now() - this.session.started) / 60000)),
+              turns: [...this.turns.values()].filter((t) => t.role === 'user').length,
+            }
+          : null;
         this.session = null;
         this.summary = msg;
         this.app.audio.stopPlayback();
@@ -632,6 +711,7 @@ export class TalkView {
       return;
     }
     const startsFresh = this.app.audio.enqueue(binary, msg.audio.sample_rate);
+    if (msg.replay) this.syncAuto();
     if (msg.index === 0 && !msg.replay) {
       const userTurn = this.replyFor.get(msg.turn_id);
       const sent = userTurn ? this.sentAt.get(userTurn) : undefined;

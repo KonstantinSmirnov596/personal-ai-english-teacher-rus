@@ -3,6 +3,7 @@
 import { ru } from '../i18n/ru.js';
 import { del, get } from './api.js';
 import { clear, el } from './dom.js';
+import { renderSummary } from './summary.js';
 
 const H = ru.history;
 
@@ -79,6 +80,7 @@ export class HistoryView {
         el('a', { class: 'btn btn-small', href: `/api/sessions/${id}/export?format=csv`, download: '', text: `${H.export} CSV` }),
       ]),
     );
+    if (s.summary) col.append(renderSummary(this.app, { ...s.summary, session_id: id }, null, null));
     for (const t of s.turns) {
       const node = el('article', { class: `turn ${t.role}`, 'data-turn-id': t.id }, [
         el('div', { class: 'turn-label', text: t.role === 'user' ? ru.talk.you : ru.talk.tutor }),

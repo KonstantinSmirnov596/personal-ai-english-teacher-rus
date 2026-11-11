@@ -6,6 +6,8 @@ import { AudioEngine } from './audio.js';
 import { ConnectionsView } from './connections.js';
 import { clear, el, icons } from './dom.js';
 import { HistoryView } from './history.js';
+import { SettingsView } from './settings.js';
+import { VocabView } from './vocab.js';
 import { TalkView } from './talk.js';
 import { CoreSocket } from './ws.js';
 
@@ -18,7 +20,7 @@ class App {
     this.activeConnection = null;
     this.modelsReady = false;
     this.socketOpen = false;
-    this.listeners = new Set();
+    this.pending = new Map(); // request_id -> {resolve, reject}
     this.socket = new CoreSocket(
       (msg, bin) => this.onMessage(msg, bin),
       (status, code) => this.onSocketStatus(status, code),
@@ -26,6 +28,8 @@ class App {
     this.talk = new TalkView(this);
     this.connections = new ConnectionsView(this);
     this.history = new HistoryView(this);
+    this.vocab = new VocabView(this);
+    this.settingsView = new SettingsView(this);
     this.header = el('header', { class: 'header' });
     this.body = el('div', { class: 'app-body' });
     root.append(this.header, this.body);
@@ -63,7 +67,26 @@ class App {
     this.talk.onSocketStatus(status, code);
   }
 
+  // Sends a helper request and resolves with helper.result data (or rejects on error).
+  askHelper(msg, binary) {
+    const requestId = crypto.randomUUID();
+    return new Promise((resolve, reject) => {
+      this.pending.set(requestId, { resolve, reject });
+      if (!this.socket.send({ ...msg, request_id: requestId }, binary)) {
+        this.pending.delete(requestId);
+        reject(Object.assign(new Error('offline'), { code: 'network' }));
+      }
+    });
+  }
+
   onMessage(msg, binary) {
+    if (msg.request_id && this.pending.has(msg.request_id) && (msg.type === 'helper.result' || msg.type === 'error')) {
+      const p = this.pending.get(msg.request_id);
+      this.pending.delete(msg.request_id);
+      if (msg.type === 'helper.result') p.resolve(msg.data);
+      else p.reject(Object.assign(new Error(msg.code), { code: msg.code }));
+      return;
+    }
     if (msg.type === 'hello') {
       this.hello = msg;
       this.settings = msg.settings;
@@ -97,7 +120,10 @@ class App {
     let current = 'talk';
     if (section === 'settings') {
       current = 'settings';
-      this.body.append(this.connections.render(sub || 'connections'));
+      this.body.append(sub && sub !== 'connections' ? this.settingsView.render(sub) : this.connections.render());
+    } else if (section === 'vocab') {
+      current = 'vocab';
+      this.body.append(this.vocab.render());
     } else if (section === 'history') {
       current = 'history';
       this.body.append(this.history.render(sub));
@@ -112,7 +138,7 @@ class App {
     const h = clear(this.header);
     const navLink = (key, href) =>
       el('a', { href, 'aria-current': this.current === key ? 'page' : null, text: ru.nav[key] });
-    h.append(el('nav', { class: 'nav', 'aria-label': ru.nav.sections }, [navLink('talk', '#/talk'), navLink('history', '#/history')]));
+    h.append(el('nav', { class: 'nav', 'aria-label': ru.nav.sections }, [navLink('talk', '#/talk'), navLink('vocab', '#/vocab'), navLink('history', '#/history')]));
     const center = el('div', { class: 'header-center' });
     if (this.current === 'talk') this.talk.renderHeaderCenter(center);
     h.append(center);
