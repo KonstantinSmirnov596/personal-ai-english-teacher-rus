@@ -249,9 +249,14 @@ async def get_settings(request: Request) -> dict[str, Any]:
 async def patch_settings(request: Request, body: SettingsPatch) -> dict[str, Any]:
     core = core_of(request)
     try:
-        return core.settings.patch(body).model_dump()
+        updated = core.settings.patch(body)
     except ValueError as e:
         raise ApiError(422, "validation") from e
+    if body.audio_retention_days is not None:
+        from trainer.maintenance import cleanup_audio
+
+        cleanup_audio(core)
+    return updated.model_dump()
 
 
 @router.get("/voices")

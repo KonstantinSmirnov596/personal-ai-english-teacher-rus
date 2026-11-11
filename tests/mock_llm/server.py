@@ -98,7 +98,69 @@ def _json_reply(body: dict[str, Any], script: Script) -> str:
             items = []
         better = (said + " Indeed.") if items else ""
         return json.dumps({"items": items, "better": better}, ensure_ascii=False)
+    if "end-of-session notes" in system:
+        return json.dumps(_summary_reply(body), ensure_ascii=False)
+    user = " ".join(
+        m.get("content", "") for m in body.get("messages", []) if m.get("role") == "user"
+    )
+    if "Suggest replies" in user:
+        return json.dumps(
+            {
+                "options": [
+                    {"en": "Sure, I can tell you more about it."},
+                    {"en": "Actually, could we talk about something else?"},
+                ]
+            }
+        )
+    if "Translate the sentence into natural Russian" in user:
+        return json.dumps({"ru": "Тестовый перевод реплики."}, ensure_ascii=False)
+    if "wants to say something in American English" in user:
+        return json.dumps(
+            {
+                "en": "I'd like to ask a question.",
+                "alt": "Can I ask you something?",
+                "note_ru": "Тестовая заметка.",
+            },
+            ensure_ascii=False,
+        )
+    if "Check a spoken answer" in user:
+        return json.dumps(
+            {"correct": False, "note_ru": "Тестовая проверка: нужен for."}, ensure_ascii=False
+        )
     return json.dumps({"ok": True})
+
+
+def _summary_reply(body: dict[str, Any]) -> dict[str, Any]:
+    data = json.loads(body["messages"][-1]["content"])
+    lines: list[str] = data.get("tutor_lines", [])
+    phrases = []
+    if lines:
+        words = lines[0].rstrip(".?!").split()
+        if len(words) >= 3:
+            phrases.append(
+                {"en": " ".join(words[-3:]), "ru": "тестовая фраза", "context": lines[0]}
+            )
+    if not data.get("focus_pattern"):
+        return {"key_takeaway": None, "exercise": None, "phrases": phrases}
+    examples = [
+        {"wrong": e["quote"], "right": e["fix"]} for e in data.get("focus_examples", [])[:2]
+    ]
+    return {
+        "key_takeaway": {
+            "title": "for / since",
+            "explanation_ru": "For ставится с длительностью, since — с моментом начала.",
+            "examples": examples,
+        },
+        "exercise": {
+            "prompt_ru": "Я работаю здесь три года.",
+            "answer_en": "I have worked here for three years.",
+            "accept": [
+                "I've worked here for three years.",
+                "I've been working here for three years.",
+            ],
+        },
+        "phrases": phrases,
+    }
 
 
 def build_app(state: MockState) -> FastAPI:

@@ -126,6 +126,10 @@ MIGRATIONS: list[str] = [
         updated_at TEXT
     );
     """,
+    # 2: consecutive sessions with a pattern (focus rule, stage 2.5)
+    """
+    ALTER TABLE pattern ADD COLUMN session_streak INTEGER NOT NULL DEFAULT 0;
+    """,
 ]
 
 

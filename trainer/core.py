@@ -89,13 +89,20 @@ class Core:
         self.ws_last_change = time.monotonic()
         self.current_ws: Any = None
         self._load_task: asyncio.Task[None] | None = None
+        self._cleanup_task: asyncio.Task[None] | None = None
 
     async def startup(self) -> None:
+        from trainer.maintenance import cleanup_loop
+
         self.scenarios.seed_builtin(builtin_scenarios())
+        self._cleanup_task = asyncio.create_task(cleanup_loop(self))
         if self.load_models:
             self._load_task = asyncio.create_task(self._load_models())
 
     async def shutdown(self) -> None:
+        for task in (self._cleanup_task, self._load_task):
+            if task is not None and not task.done():
+                task.cancel()
         await self.llm.aclose()
         self.gpu.shutdown()
         self.db.close()

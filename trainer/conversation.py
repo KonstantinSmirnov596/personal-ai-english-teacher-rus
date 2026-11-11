@@ -118,6 +118,8 @@ class Conversation:
         self.background: set[asyncio.Task[Any]] = set()
         self.corrector_tasks: set[asyncio.Task[Any]] = set()
         self._fold_lock = asyncio.Lock()
+        self.replay_cache: dict[Any, list[tuple[str, bytes]]] = {}
+        self.last_summary: dict[str, Any] | None = None
 
     # --- plumbing --------------------------------------------------------------------------
 
@@ -294,6 +296,8 @@ class Conversation:
 
         summary = await build_summary(self.core, session) if send_summary else None
         self.core.sessions.end(session.id, summary)
+        self.last_summary = summary
+        self.replay_cache.clear()
         if summary is not None:
             await self.send(SummaryMsg(session_id=session.id, **summary))
         await self.set_state("idle")
