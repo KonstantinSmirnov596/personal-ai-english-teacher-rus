@@ -60,7 +60,12 @@ if ($SkipModels) {
 # 5. Window fonts (Inter, JetBrains Mono) into web\fonts.
 Write-Step 'fonts -> web\fonts'
 Push-Location $RepoRoot
-try { Invoke-Checked $VenvPython -m trainer.setup_fonts } finally { Pop-Location }
+try {
+    Invoke-Checked $VenvPython -m trainer.setup_fonts
+    # 6. Voice activity detection for the window (Silero VAD, ONNX Runtime Web) into web\vendor.
+    Write-Step 'vendor -> web\vendor'
+    Invoke-Checked $VenvPython -m trainer.setup_vendor
+} finally { Pop-Location }
 
 Write-Host 'setup: OK' -ForegroundColor Green
 exit 0

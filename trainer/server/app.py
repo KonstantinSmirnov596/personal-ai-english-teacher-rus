@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import mimetypes
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -22,6 +23,19 @@ log = logging.getLogger(__name__)
 
 WEB_DIR = Path(__file__).resolve().parent.parent.parent / "web"
 
+# Windows' registry MIME map is unreliable for these; module scripts and WebAssembly need
+# exact types (instantiateStreaming and ES module loading reject anything else).
+for _ext, _type in (
+    (".js", "text/javascript"),
+    (".mjs", "text/javascript"),
+    (".wasm", "application/wasm"),
+    (".onnx", "application/octet-stream"),
+    (".svg", "image/svg+xml"),
+    (".woff2", "font/woff2"),
+    (".css", "text/css"),
+):
+    mimetypes.add_type(_type, _ext)
+
 
 class ApiError(Exception):
     def __init__(self, status: int, code: str, message_ru: str | None = None) -> None:
@@ -34,6 +48,9 @@ class ApiError(Exception):
 def csp(port: int) -> str:
     return (
         "default-src 'self'; "
+        # 'wasm-unsafe-eval' lets ONNX Runtime Web compile the local Silero VAD WebAssembly;
+        # it does not allow eval() of strings (see docs/PROGRESS.md, «Решения»).
+        "script-src 'self' 'wasm-unsafe-eval'; "
         f"connect-src 'self' ws://127.0.0.1:{port}; "
         "media-src 'self' blob:; worker-src 'self' blob:; object-src 'none'; "
         "base-uri 'none'; frame-ancestors 'none'"

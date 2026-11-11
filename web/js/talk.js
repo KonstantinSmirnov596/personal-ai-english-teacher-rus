@@ -3,6 +3,7 @@
 import { ru } from '../i18n/ru.js';
 import { get, patch, post } from './api.js';
 import { clear, el, formatClock, icons, isTextField } from './dom.js';
+import { AutoTurns, floatToPcm16 } from './vad.js';
 import { Wave } from './wave.js';
 
 const RETRYABLE_SWITCH = new Set(['llm_unauthorized', 'llm_unreachable']);
@@ -33,6 +34,12 @@ export class TalkView {
     this.micState = 'unknown'; // unknown | ready | denied
     this.summary = null;
     this.openMenu = null;
+    this.auto = new AutoTurns(app.audio, {
+      onStart: () => this.onAutoStart(),
+      onEnd: (audio) => this.onAutoEnd(audio),
+      onMisfire: () => this.onAutoMisfire(),
+    });
+    this.autoTurn = false;
     this.buildPanel();
     this.app.audio.onPlaybackDrained = () => this.onPlaybackDrained();
     document.addEventListener('keydown', (e) => this.onKeyDown(e));
@@ -161,9 +168,11 @@ export class TalkView {
     this.micButton = el('button', { type: 'button', class: 'mic-button', 'data-testid': 'mic-button', 'aria-label': ru.panel.micStart }, [icons.mic()]);
     this.micButton.addEventListener('click', () => this.toggleTurn());
     this.keysNode = el('div', { class: 'keys' });
-    const manual = el('button', { type: 'button', 'aria-pressed': 'true', text: ru.panel.manual });
-    const auto = el('button', { type: 'button', 'aria-pressed': 'false', disabled: true, text: ru.panel.auto });
-    this.modeToggle = el('div', { class: 'segmented', role: 'group', 'aria-label': ru.panel.turnMode, 'data-testid': 'mode-toggle' }, [manual, auto]);
+    this.manualButton = el('button', { type: 'button', 'aria-pressed': 'true', 'data-mode': 'manual', text: ru.panel.manual });
+    this.autoButton = el('button', { type: 'button', 'aria-pressed': 'false', 'data-mode': 'auto', text: ru.panel.auto });
+    this.manualButton.addEventListener('click', () => this.setTurnMode('manual'));
+    this.autoButton.addEventListener('click', () => this.setTurnMode('auto'));
+    this.modeToggle = el('div', { class: 'segmented', role: 'group', 'aria-label': ru.panel.turnMode, 'data-testid': 'mode-toggle' }, [this.manualButton, this.autoButton]);
     this.correctionChip = el('button', { type: 'button', class: 'chip-button', 'aria-haspopup': 'menu', 'data-testid': 'correction-mode' });
     this.correctionChip.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -214,6 +223,14 @@ export class TalkView {
     clear(this.keysNode).append(...keys.map((k) => el('span', { text: k })));
     const mode = (this.app.settings && this.app.settings.correction_mode) || 'on_click';
     clear(this.correctionChip).append(el('span', { text: `${ru.correctionModes.label}: ${ru.correctionModes[mode]}` }), icons.chevron());
+    const turnMode = this.turnMode();
+    this.manualButton.setAttribute('aria-pressed', String(turnMode === 'manual'));
+    this.autoButton.setAttribute('aria-pressed', String(turnMode === 'auto'));
+    this.panel.dataset.turnMode = turnMode;
+    if (turnMode === 'auto') {
+      const autoKeys = s === 'speaking' || s === 'thinking' ? ru.panel.keysAutoSpeaking : ru.panel.keysAuto;
+      clear(this.keysNode).append(...autoKeys.map((k) => el('span', { text: k })));
+    }
   }
 
   panelState() {
@@ -309,8 +326,102 @@ export class TalkView {
 
   toggleTurn() {
     if (this.micButton.disabled) return;
+    if (this.turnMode() === 'auto') {
+      // Auto mode: the detector starts and ends turns; Space only stops the tutor's reply.
+      if (this.app.audio.playing || this.coreState === 'thinking' || this.coreState === 'speaking') {
+        this.app.audio.stopPlayback();
+        this.app.socket.send({ type: 'interrupt' });
+      }
+      return;
+    }
     if (this.recording) this.sendTurn();
     else this.startTurn();
+  }
+
+  // --- auto mode -------------------------------------------------------------------------
+
+  turnMode() {
+    return (this.app.settings && this.app.settings.turn_mode) || 'manual';
+  }
+
+  async setTurnMode(mode) {
+    if (mode === this.turnMode()) return;
+    if (this.recording && !this.autoTurn) this.cancelTurn();
+    try {
+      this.app.settings = await patch('/api/settings', { turn_mode: mode });
+    } catch {
+      return;
+    }
+    this.updatePanel();
+    this.syncAuto();
+  }
+
+  // Keeps the detector running only when the learner may speak: in a session, mic ready,
+  // and the tutor silent (or the learner wears headphones, so voice may interrupt).
+  async syncAuto() {
+    const s = this.app.settings || {};
+    const busy = this.coreState === 'thinking' || this.coreState === 'speaking' || this.app.audio.playing;
+    const wanted = this.turnMode() === 'auto' && !!this.session && this.micState === 'ready' && this.app.modelsReady;
+    const listen = wanted && (!busy || s.headphones === true) && !(this.autoTurn && this.coreState === 'transcribing');
+    try {
+      if (listen) {
+        if (!this.auto.vad) await this.auto.start(s.pause_ms || 1500);
+        else {
+          this.auto.setPause(s.pause_ms || 1500);
+          await this.auto.resume();
+        }
+      } else {
+        await this.auto.pause();
+      }
+    } catch (e) {
+      console.warn('voice activity detector unavailable', e && e.message);
+    }
+  }
+
+  onAutoStart() {
+    if (!this.session || this.recording) return;
+    const s = this.app.settings || {};
+    const busy = this.coreState === 'thinking' || this.coreState === 'speaking' || this.app.audio.playing;
+    if (busy) {
+      if (!s.headphones) return;
+      this.app.audio.stopPlayback(); // voice interruption: the core treats turn.begin as interrupt
+    }
+    const turnId = uuid();
+    this.currentTurnId = turnId;
+    this.recording = true;
+    this.autoTurn = true;
+    this.recordStarted = performance.now();
+    this.app.socket.send({ type: 'turn.begin', turn_id: turnId, mode: 'auto' });
+    this.addUserTurn(turnId);
+    this.setHint('');
+    this.updatePanel();
+  }
+
+  onAutoEnd(samples) {
+    if (!this.autoTurn) return;
+    const turnId = this.currentTurnId;
+    this.recording = false;
+    this.autoTurn = false;
+    const pcm = floatToPcm16(samples);
+    this.app.socket.send(
+      { type: 'turn.audio', turn_id: turnId, audio: { sample_rate: 16000, format: 'pcm_s16le', bytes: pcm.byteLength } },
+      pcm,
+    );
+    this.sentAt.set(turnId, performance.now());
+    this.lastUserTurnId = turnId;
+    const t = this.turns.get(turnId);
+    if (t) this.setTurnPlaceholder(t, ru.talk.transcribing);
+    this.updatePanel();
+  }
+
+  onAutoMisfire() {
+    if (!this.autoTurn) return;
+    const turnId = this.currentTurnId;
+    this.recording = false;
+    this.autoTurn = false;
+    this.app.socket.send({ type: 'turn.cancel', turn_id: turnId });
+    this.removeTurn(turnId);
+    this.updatePanel();
   }
 
   startTurn() {
@@ -355,6 +466,7 @@ export class TalkView {
     const turnId = this.currentTurnId;
     this.app.audio.cancelRecording();
     this.recording = false;
+    this.autoTurn = false;
     this.app.socket.send({ type: 'turn.cancel', turn_id: turnId });
     this.removeTurn(turnId);
     this.updatePanel();
@@ -434,10 +546,12 @@ export class TalkView {
         this.app.activeConnection = msg.connection;
         this.render();
         this.app.renderHeader();
+        this.syncAuto();
         break;
       case 'state':
         this.coreState = msg.value;
         this.updatePanel();
+        this.syncAuto();
         break;
       case 'user.transcript':
         this.onTranscript(msg);
@@ -477,6 +591,7 @@ export class TalkView {
         this.session = null;
         this.summary = msg;
         this.app.audio.stopPlayback();
+        this.auto.pause();
         this.render();
         this.app.renderHeader();
         break;
@@ -518,6 +633,7 @@ export class TalkView {
   }
 
   onPlaybackDrained() {
+    this.syncAuto();
     const turnId = this.currentTutor;
     if (turnId && this.doneReplies.has(turnId)) {
       this.doneReplies.delete(turnId);

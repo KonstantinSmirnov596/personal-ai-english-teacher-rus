@@ -57,6 +57,14 @@ def _pink_noise(seconds: float, level_db: float, seed: int = 7) -> np.ndarray:
     return (pink * 10 ** (level_db / 20.0)).astype(np.float32)
 
 
+def trim_silence(audio: np.ndarray, threshold: float = 0.01, margin_s: float = 0.03) -> np.ndarray:
+    loud = np.nonzero(np.abs(audio) > threshold)[0]
+    if len(loud) == 0:
+        return audio
+    margin = int(margin_s * OUT_RATE)
+    return audio[max(0, loud[0] - margin) : min(len(audio), loud[-1] + margin)]
+
+
 def _write(name: str, audio: np.ndarray) -> Path:
     from trainer.speech.audio import write_wav
 
@@ -88,7 +96,8 @@ def ensure_turns(synth: _Synth | None = None) -> dict[str, Path]:
         parts: list[np.ndarray] = []
         for seg in spec["segments"]:
             if "say" in seg:
-                audio = synth.say(seg["say"], spec["voice"])
+                # Kokoro pads speech with ~0.4 s of silence; trim it so pauses are exact.
+                audio = trim_silence(synth.say(seg["say"], spec["voice"]))
                 if "max_s" in seg:
                     audio = audio[: int(seg["max_s"] * OUT_RATE)]
                 parts.append(audio)

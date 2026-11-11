@@ -81,13 +81,17 @@ def launch_context(pw: Any, wav: Path, profile: Path) -> Any:
 
 @pytest.fixture(scope="module")
 def e2e(tmp_path_factory: pytest.TempPathFactory) -> Iterator[E2E]:
+    yield from open_env(tmp_path_factory, "turn_basic")
+
+
+def open_env(tmp_path_factory: pytest.TempPathFactory, wav_name: str) -> Iterator[E2E]:
     from playwright.sync_api import sync_playwright
 
     key = "sk-test-" + secrets.token_urlsafe(24)
     mock = MockLLM(key).start()
     lp = LauncherProcess(tmp_path_factory.mktemp("core"))
     profile = Path(tempfile.mkdtemp(prefix="e2e-edge-"))
-    wav = ensure_turns()["turn_basic"]
+    wav = ensure_turns()[wav_name]
     try:
         with sync_playwright() as pw:
             context = launch_context(pw, wav, profile)

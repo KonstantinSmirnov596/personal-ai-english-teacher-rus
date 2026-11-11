@@ -26,3 +26,4 @@ CLAUDE.local.md
 .tools/
 # fonts are installed by scripts/setup.ps1 (trainer.setup_fonts)
 web/fonts/
+web/vendor/

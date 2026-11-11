@@ -11,6 +11,9 @@ from pathlib import Path
 
 from trainer.paths import configure_model_env
 
+# Set HF_HOME before any model library imports huggingface_hub (it reads the variable once).
+configure_model_env()
+
 # American English Kokoro voices (lang_code 'a'), from hexgrad/Kokoro-82M VOICES.md.
 KOKORO_VOICES: tuple[str, ...] = (
     "af_heart",
