@@ -103,6 +103,7 @@ def open_window(url: str, profile: Path) -> subprocess.Popen[bytes] | None:
 async def serve(args: argparse.Namespace) -> int:
     import uvicorn
 
+    from trainer import instance
     from trainer.core import Core
     from trainer.paths import configure_model_env, data_dir
     from trainer.protocol import MAX_BINARY_FRAME
@@ -140,6 +141,7 @@ async def serve(args: argparse.Namespace) -> int:
                 return
             await asyncio.sleep(0.05)
         log.info("core listening on 127.0.0.1:%d", port)
+        instance.write_info(root, port)
         if args.no_window:
             print(f"TRAINER_URL {url}", flush=True)
         else:
@@ -162,6 +164,7 @@ async def serve(args: argparse.Namespace) -> int:
         watcher.cancel()
         with contextlib.suppress(asyncio.CancelledError):
             await watcher
+        instance.clear_info(root)
     return 0
 
 
@@ -176,8 +179,35 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--port", type=int, default=None, help="port (0 = any free port)")
     ap.add_argument("--exit-when-idle", type=float, default=None, help="seconds; 0 disables")
     ap.add_argument("--no-models", action="store_true", help="do not preload models at start")
+    ap.add_argument(
+        "--wait-existing",
+        type=float,
+        default=15.0,
+        help="seconds to wait for a closing instance before giving up",
+    )
     args = ap.parse_args(argv)
-    setup_logging(data_dir() / "logs")
+
+    # Started from the shortcut (pythonw) there is no console: give libraries a place to print.
+    if sys.stdout is None:
+        sys.stdout = open(os.devnull, "w", encoding="utf-8")  # noqa: SIM115
+    if sys.stderr is None:
+        sys.stderr = open(os.devnull, "w", encoding="utf-8")  # noqa: SIM115
+
+    from trainer import instance
+
+    root = data_dir()
+    root.mkdir(parents=True, exist_ok=True)
+    lock = instance.acquire(root)
+    if lock is None:
+        # Another core serves this data directory: show its window instead of starting twice.
+        if instance.activate_window():
+            return 0
+        # No window: that core is in its 10 s shutdown grace period. Wait for it to exit.
+        lock = instance.wait_and_acquire(root, args.wait_existing)
+        if lock is None:
+            print("trainer is already running", flush=True)
+            return 3
+    setup_logging(root / "logs")
     try:
         return asyncio.run(serve(args))
     except KeyboardInterrupt:

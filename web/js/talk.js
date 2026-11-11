@@ -92,6 +92,14 @@ export class TalkView {
       );
       return;
     }
+    for (const problem of this.app.problems || []) {
+      wrap.append(
+        el('div', { class: 'notice', role: 'alert', 'data-testid': 'problem-banner', 'data-code': problem.code }, [
+          el('h2', { text: ru.problems.title }),
+          el('p', { text: ru.problems[problem.code] || problem.message_ru }),
+        ]),
+      );
+    }
     if (this.micState === 'denied') wrap.append(this.micDeniedNotice());
     try {
       this.scenarios = await get('/api/scenarios');
@@ -283,6 +291,7 @@ export class TalkView {
     this.panel.dataset.state = s;
     let text = ru.states[s] || ru.states.idle;
     if (!this.app.socketOpen) text = ru.states.offline;
+    else if (this.app.problems && this.app.problems.length) text = ru.problems.state;
     else if (!this.app.modelsReady) text = ru.states.loading;
     else if (this.micState === 'denied') text = ru.states.noMic;
     this.stateText.textContent = text;
@@ -609,6 +618,7 @@ export class TalkView {
 
   onModelsReady() {
     this.updatePanel();
+    if (!this.session && !this.summary && this.isActive()) this.renderStart();
   }
 
   onMessage(msg, binary) {

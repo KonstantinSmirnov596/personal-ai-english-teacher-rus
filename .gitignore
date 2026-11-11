@@ -27,3 +27,6 @@ CLAUDE.local.md
 # fonts are installed by scripts/setup.ps1 (trainer.setup_fonts)
 web/fonts/
 web/vendor/
+
+# application shortcut is created by scripts/setup.ps1
+*.lnk

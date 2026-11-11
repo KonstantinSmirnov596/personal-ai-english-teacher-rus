@@ -45,6 +45,7 @@ class ModelStatus:
     tts: str = "not_loaded"
     phoneme: str = "not_loaded"
     error: str = ""
+    problem: str = ""  # no_gpu | models_missing | model_load_failed
     load_ms: dict[str, float] = field(default_factory=dict)
 
     @property
@@ -110,7 +111,33 @@ class Core:
         self.gpu.shutdown()
         self.db.close()
 
+    def _preflight(self) -> str:
+        """Runs on the GPU thread before loading: is there a video card, are the models here?"""
+        import torch
+
+        from trainer.model_registry import STT, TTS, local_path
+
+        if not torch.cuda.is_available():
+            return "no_gpu"
+        try:
+            local_path(STT)
+            local_path(TTS)
+        except Exception:
+            return "models_missing"
+        return ""
+
     async def _load_models(self) -> None:
+        try:
+            problem = await self.gpu.run(self._preflight)
+        except Exception:
+            log.exception("model preflight failed")
+            problem = "model_load_failed"
+        if problem:
+            log.error("models are not loaded: %s", problem)
+            self.models.problem = problem
+            self.models.error = problem
+            self.models.stt = self.models.tts = "error"
+            return
         for name, model in (("stt", self.stt), ("tts", self.tts)):
             setattr(self.models, name, "loading")
             started = time.perf_counter()
@@ -120,6 +147,7 @@ class Core:
                 log.exception("failed to load %s model", name)
                 setattr(self.models, name, "error")
                 self.models.error = f"{name}: {type(e).__name__}"
+                self.models.problem = "model_load_failed"
                 continue
             self.models.load_ms[name] = round((time.perf_counter() - started) * 1000)
             setattr(self.models, name, "ready")

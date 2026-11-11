@@ -59,6 +59,11 @@ async def health(request: Request) -> dict[str, Any]:
             "phoneme": core.models.phoneme,
         },
         "active_connection": core.connection_ref(active) if active else None,
+        "problems": (
+            [{"code": core.models.problem, "message_ru": i18n_ru.error_text(core.models.problem)}]
+            if core.models.problem
+            else []
+        ),
     }
 
 

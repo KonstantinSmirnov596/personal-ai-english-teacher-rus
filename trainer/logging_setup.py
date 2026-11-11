@@ -68,6 +68,19 @@ class RedactingFilter(logging.Filter):
 
 _configured = False
 
+LOG_MAX_BYTES = 2_000_000
+LOG_BACKUPS = 5
+
+
+def rotating_handler(
+    log_dir: Path, max_bytes: int = LOG_MAX_BYTES, backups: int = LOG_BACKUPS
+) -> logging.Handler:
+    """trainer.log with rotation: at most (backups + 1) files of max_bytes each."""
+    log_dir.mkdir(parents=True, exist_ok=True)
+    return logging.handlers.RotatingFileHandler(
+        log_dir / "trainer.log", maxBytes=max_bytes, backupCount=backups, encoding="utf-8"
+    )
+
 
 def setup_logging(log_dir: Path | None, level: int = logging.INFO) -> None:
     """Root logger -> rotating file (and stderr). Safe to call more than once."""
@@ -81,11 +94,7 @@ def setup_logging(log_dir: Path | None, level: int = logging.INFO) -> None:
     handlers: list[logging.Handler] = []
     if log_dir is not None:
         log_dir.mkdir(parents=True, exist_ok=True)
-        handlers.append(
-            logging.handlers.RotatingFileHandler(
-                log_dir / "trainer.log", maxBytes=2_000_000, backupCount=5, encoding="utf-8"
-            )
-        )
+        handlers.append(rotating_handler(log_dir))
     if sys.stderr is not None:
         handlers.append(logging.StreamHandler(sys.stderr))
     for h in handlers:

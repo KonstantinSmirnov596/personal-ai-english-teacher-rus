@@ -67,5 +67,10 @@ try {
     Invoke-Checked $VenvPython -m trainer.setup_vendor
 } finally { Pop-Location }
 
+# 7. Shortcut in the project folder (copy it to the Desktop with scripts\make_shortcut.ps1 -Desktop).
+Write-Step 'shortcut'
+& (Join-Path $PSScriptRoot 'make_shortcut.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'shortcut creation failed' }
+
 Write-Host 'setup: OK' -ForegroundColor Green
 exit 0

@@ -108,6 +108,10 @@ class App {
         if (h.status === 'ok') {
           this.modelsReady = true;
           this.talk.onModelsReady();
+        } else if (h.status === 'error') {
+          this.problems = h.problems || [];
+          this.talk.onModelsReady();
+          return;
         }
       } catch {
         // core restarting; keep polling
