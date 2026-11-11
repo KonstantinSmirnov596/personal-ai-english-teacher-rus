@@ -36,6 +36,8 @@ from trainer.protocol import (
     Hello,
     PlaybackEnded,
     PlaybackStarted,
+    PronFlag,
+    PronFlags,
     ScenarioRef,
     SessionEnd,
     SessionStart,
@@ -118,6 +120,7 @@ class Conversation:
         self.background: set[asyncio.Task[Any]] = set()
         self.corrector_tasks: set[asyncio.Task[Any]] = set()
         self._fold_lock = asyncio.Lock()
+        self._first_audio_gate: asyncio.Event | None = None
         self.replay_cache: dict[Any, list[tuple[str, bytes]]] = {}
         self.last_summary: dict[str, Any] | None = None
 
@@ -365,9 +368,14 @@ class Conversation:
                 self.corrector_tasks,
             )
         await self.set_state("thinking", turn_id)
+        gate = asyncio.Event()
+        self._first_audio_gate = gate
         self.reply_task = asyncio.create_task(
             self.generate_reply(session, turn_id, received, stt_ms)
         )
+        self.reply_task.add_done_callback(lambda _t: gate.set())
+        if self.core.settings.get().pron_in_conversation:
+            self._spawn(self.pron_flags(session, turn_id, words, audio16, gate))
 
     def _store_audio(self, session_id: str, turn_id: str, audio16: np.ndarray) -> str | None:
         if self.core.settings.get().audio_retention_days <= 0:
@@ -542,6 +550,8 @@ class Conversation:
             )
             if first:
                 reply.timing["first_audio_ms"] = (time.perf_counter() - reply.started) * 1000.0
+                if self._first_audio_gate is not None:
+                    self._first_audio_gate.set()
                 await self.set_state("speaking", reply.turn_id)
                 if send_timing and reply.user_turn_id is not None:
                     await self.send(
@@ -606,6 +616,38 @@ class Conversation:
             if record and session is not None and (text or reply.user_turn_id is None):
                 self._record_tutor_turn(session, reply, text, True)
         await self.set_state("idle")
+
+    # --- pronunciation marks in conversation (stage 3.9) -----------------------------------
+
+    async def pron_flags(
+        self,
+        session: SessionCtx,
+        turn_id: str,
+        words: list[WordOut],
+        audio16: np.ndarray,
+        gate: asyncio.Event,
+    ) -> None:
+        # Wait until the reply's first audio is out: marks must not delay the conversation.
+        with contextlib.suppress(TimeoutError):
+            await asyncio.wait_for(gate.wait(), timeout=30)
+        try:
+            flags = await self.core.pron.assess_turn(
+                [w.model_dump() for w in words], audio16, session_id=session.id, turn_id=turn_id
+            )
+        except Exception:
+            log.exception("pronunciation marks failed")
+            return
+        if flags:
+            items = [
+                PronFlag(
+                    word_index=f["word_index"],
+                    expected=f["expected"],
+                    heard=f["heard"],
+                    tip_ru=f["tip_ru"],
+                )
+                for f in flags
+            ]
+            await self.send(PronFlags(turn_id=turn_id, items=items))
 
     # --- corrector -------------------------------------------------------------------------
 

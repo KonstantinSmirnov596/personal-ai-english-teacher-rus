@@ -153,6 +153,6 @@ async def build_summary(core: Any, session: Any) -> dict[str, Any]:
         "exercise": llm_part["exercise"],
         "corrections": corrections,
         "patterns": patterns,
-        "sounds": [],
+        "sounds": core.pron.session_sounds(session.id),
         "phrases": llm_part["phrases"],
     }

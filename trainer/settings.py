@@ -29,6 +29,10 @@ class Settings(BaseModel):
     input_device_id: str = ""
     output_device_id: str = ""
     noise_suppression: bool = True
+    # Stage 3: cautious pronunciation marks in free conversation.
+    pron_in_conversation: bool = True
+    # Reading mode: open the microphone without noise suppression and auto gain.
+    reading_raw_mic: bool = False
 
     @field_validator("voice")
     @classmethod
@@ -54,3 +58,5 @@ class SettingsPatch(BaseModel):
     input_device_id: str | None = None
     output_device_id: str | None = None
     noise_suppression: bool | None = None
+    pron_in_conversation: bool | None = None
+    reading_raw_mic: bool | None = None

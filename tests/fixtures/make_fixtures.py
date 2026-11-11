@@ -109,6 +109,66 @@ def ensure_turns(synth: _Synth | None = None) -> dict[str, Path]:
     return out
 
 
+def pron_spec() -> dict:
+    return load_spec()["pron"]
+
+
+def ensure_reading(synth: _Synth | None = None) -> list[dict]:
+    """Every reading phrase read by three American voices: read_<phrase_id>_<voice>.wav."""
+    from trainer.data_files import reading_phrases
+
+    synth = synth or _Synth()
+    out: list[dict] = []
+    for phrase in reading_phrases()["phrases"]:
+        for voice in pron_spec()["voices"]:
+            name = f"read_{phrase['id']}_{voice}"
+            path = GENERATED / f"{name}.wav"
+            if not path.exists():
+                _write(name, synth.say(phrase["text"], voice))
+            out.append({"phrase": phrase, "voice": voice, "path": path})
+    return out
+
+
+def ensure_pairs(synth: _Synth | None = None, carriers: list[str] | None = None) -> list[dict]:
+    """Minimal pairs of the catalog: the second word is spoken where the first is expected.
+
+    The word is said inside short carrier phrases, once before a pause and once before a
+    consonant (pair_<expected>_<actual>_<voice>_c<N>.wav). Extra carriers are for experiments.
+    """
+    from trainer.data_files import l1_catalog
+
+    synth = synth or _Synth()
+    spec = pron_spec()
+    out: list[dict] = []
+    for ci, carrier in enumerate(carriers or spec["pair_carriers"], start=1):
+        tag = f"c{ci}" if carriers is None else "x" + "".join(c for c in carrier if c.isalpha())
+        word_index = next(i for i, w in enumerate(carrier.split()) if "{word}" in w)
+        for entry in l1_catalog()["entries"]:
+            for pair in entry.get("pairs", []):
+                expected, actual = pair["words"]
+                for voice in spec["voices"]:
+                    name = f"pair_{expected}_{actual}_{voice}_{tag}"
+                    path = GENERATED / f"{name}.wav"
+                    if not path.exists():
+                        _write(name, synth.say(carrier.format(word=actual), voice))
+                    out.append(
+                        {
+                            "entry_id": entry["id"],
+                            "default_level": entry.get("default_level", "approx"),
+                            "expected": expected,
+                            "actual": actual,
+                            "heard": pair["heard"],
+                            "voice": voice,
+                            "carrier": carrier,
+                            "path": path,
+                            "reference_text": carrier.format(word=expected),
+                            "actual_text": carrier.format(word=actual),
+                            "word_index": word_index,
+                        }
+                    )
+    return out
+
+
 def main(argv: list[str]) -> int:
     what = argv[1] if len(argv) > 1 else "all"
     synth = _Synth()
@@ -118,6 +178,9 @@ def main(argv: list[str]) -> int:
     if what in ("turns", "all"):
         for path in ensure_turns(synth).values():
             print(path)
+    if what in ("pron", "all"):
+        print(len(ensure_reading(synth)), "reading fixtures")
+        print(len(ensure_pairs(synth)), "pair fixtures")
     return 0
 
 

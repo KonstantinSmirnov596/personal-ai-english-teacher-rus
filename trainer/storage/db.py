@@ -130,6 +130,12 @@ MIGRATIONS: list[str] = [
     """
     ALTER TABLE pattern ADD COLUMN session_streak INTEGER NOT NULL DEFAULT 0;
     """,
+    # 3: link conversation pronunciation attempts to their session and turn (stage 3.9)
+    """
+    ALTER TABLE pron_attempt ADD COLUMN session_id TEXT;
+    ALTER TABLE pron_attempt ADD COLUMN turn_id TEXT;
+    CREATE INDEX pron_attempt_session ON pron_attempt(session_id);
+    """,
 ]
 
 

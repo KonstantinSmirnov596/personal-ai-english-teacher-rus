@@ -26,34 +26,89 @@
     "turn_basic": {
       "voice": "af_heart",
       "segments": [
-        {"say": "I have worked on this project since two years."},
-        {"silence_s": 5.0}
+        {
+          "say": "I have worked on this project since two years."
+        },
+        {
+          "silence_s": 5.0
+        }
       ]
     },
     "turn_pause_1200": {
       "voice": "af_heart",
       "segments": [
-        {"say": "I would like to talk about my new job."},
-        {"silence_s": 1.2},
-        {"say": "It is a lot more interesting than the old one."},
-        {"silence_s": 5.0}
+        {
+          "say": "I would like to talk about my new job."
+        },
+        {
+          "silence_s": 1.2
+        },
+        {
+          "say": "It is a lot more interesting than the old one."
+        },
+        {
+          "silence_s": 5.0
+        }
       ]
     },
     "too_short": {
       "voice": "af_heart",
       "segments": [
-        {"say": "Hi.", "max_s": 0.2}
+        {
+          "say": "Hi.",
+          "max_s": 0.2
+        }
       ]
     },
     "silence_5s": {
       "segments": [
-        {"silence_s": 5.0}
+        {
+          "silence_s": 5.0
+        }
       ]
     },
     "noise_5s": {
       "segments": [
-        {"pink_noise_s": 5.0, "level_db": -35.0}
+        {
+          "pink_noise_s": 5.0,
+          "level_db": -35.0
+        }
+      ]
+    },
+    "turn_accent": {
+      "voice": "am_michael",
+      "note": "'very' is pronounced 'wery' through a phoneme override",
+      "segments": [
+        {
+          "say": "I think this is a [very](/wˈɛɹi/) good idea."
+        },
+        {
+          "silence_s": 5.0
+        }
+      ]
+    },
+    "reading_p01_accent": {
+      "voice": "am_michael",
+      "note": "phrase p01 with think->sink and work->verk",
+      "segments": [
+        {
+          "say": "I [think](/sˈɪŋk/) we should [work](/vˈɜɹk/) on the third version this week."
+        },
+        {
+          "silence_s": 5.0
+        }
       ]
     }
+  },
+  "pron": {
+    "voices": [
+      "af_heart",
+      "af_bella",
+      "am_michael"
+    ],
+    "pair_carriers": [
+      "I said {word}.",
+      "Say {word} for me."
+    ]
   }
 }

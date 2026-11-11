@@ -146,10 +146,11 @@ def create_app(core: Core) -> FastAPI:
             return resp
         return FileResponse(WEB_DIR / "index.html", media_type="text/html; charset=utf-8")
 
-    from trainer.server import routes_api, routes_data, ws
+    from trainer.server import routes_api, routes_data, routes_pron, ws
 
     app.include_router(routes_api.router)
     app.include_router(routes_data.router)
+    app.include_router(routes_pron.router)
     app.add_api_websocket_route("/ws", ws.websocket_endpoint)
     app.mount("/", StaticFiles(directory=str(WEB_DIR)), name="web")
 

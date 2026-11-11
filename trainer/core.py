@@ -79,6 +79,9 @@ class Core:
         self.gpu = GpuQueue()
         self.stt = SpeechRecognizer()
         self.tts = SpeechSynthesizer()
+        from trainer.pron.service import PronService
+
+        self.pron = PronService(self)
         self.models = ModelStatus()
         self.load_models = load_models
         self.models_ready = asyncio.Event()
