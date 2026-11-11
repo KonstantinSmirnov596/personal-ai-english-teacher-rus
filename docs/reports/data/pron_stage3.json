@@ -4979,7 +4979,7 @@
     ]
   },
   "timing": {
-    "analysis_s_median_for_5s_phrase": 0.055,
-    "analysis_s_max": 12.647
+    "analysis_s_median_for_5s_phrase": 0.059,
+    "analysis_s_max": 13.033
   }
 }

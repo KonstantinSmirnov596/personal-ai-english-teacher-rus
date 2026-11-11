@@ -101,6 +101,25 @@ STAGES: dict[int, Stage] = {
         ),
         reports=("stage2.md",),
     ),
+    3: Stage(
+        suites=("fast", "gpu", "e2e"),
+        optional_suites=("live",),
+        required_tests=(
+            "tests.test_pron_logic::test_reference_words_and_merged_units",
+            "tests.test_pron_logic::test_american_tolerances",
+            "tests.test_pron_logic::test_forced_align_on_synthetic_posteriors",
+            "tests.test_pron_logic::test_catalog_matching",
+            "tests.test_pron_logic::test_levels_and_thresholds",
+            "tests.gpu.test_pron::test_false_alarms_on_native_reading",
+            "tests.gpu.test_pron::test_substitutions_are_flagged_and_named",
+            "tests.gpu.test_pron::test_assessment_time_for_a_five_second_phrase",
+            "tests.gpu.test_pron::test_feedback_lowers_sensitivity",
+            "tests.gpu.test_pron::test_conversation_marks_only_clear_errors",
+            "tests.e2e.test_reading::test_reading_marks_sounds_and_accepts_feedback",
+            "tests.e2e.test_pron_marks::test_pronunciation_mark_in_conversation",
+        ),
+        reports=("stage3.md",),
+    ),
 }
 
 

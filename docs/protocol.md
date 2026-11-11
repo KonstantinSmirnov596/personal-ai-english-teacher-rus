@@ -189,6 +189,16 @@
 
 Значения `level`: `ok`, `approx`, `error` — в интерфейсе «верно», «неточно», «ошибка».
 
+Уточнения этапа 3 (пример выше сокращён):
+
+- Попытка: кроме `attempt_id`, `score`, `words` есть `text`, `duration_s`, `analysis_ms`.
+- Слово: `source_index` — номер слова в тексте фразы, разбитом по пробелам; `tip` дополнен полями `phone_index`, `expected`, `heard` (пустая строка — звук не прозвучал) и равен `null`, если пометок нет.
+- Звук: `cls` — класс звука для статистики; `scored: false` — звук не оценивается (гласные служебных слов, слоговые согласные); `catalog_id` — запись каталога или `null`; `gop` — логарифм отношения правдоподобия ожидаемого звука к лучшему конкуренту, не больше 0.
+- `GET /api/pron/reference` принимает `text` вместо `phrase_id` (эталон отдельного слова).
+- `POST /api/pron/feedback` отвечает `{phone, sensitivity_offset, attempt}`: обновлённая попытка со снятой пометкой.
+- Ошибки: `pron_no_speech` (речь не расслышана), `pron_bad_audio`, `pron_no_text`, `audio_too_short`, `audio_too_long` — статус `422`; `pron_unavailable` — `503`.
+- `pron.flags` в разговоре: `expected` и `heard` — символы звуков, `word_index` — номер слова в `user.transcript.words`.
+
 ## Что ядро отправляет провайдеру LLM
 
 Единственный внешний обмен. Запрос: `POST {base_url}/chat/completions`, заголовок `Authorization: Bearer <ключ>`, тело `{model, messages, stream, ...extra_params}`. Корректор, итоги и помощники добавляют `response_format: {"type": "json_object"}`, если шаблон подключения это поддерживает. В `messages` попадают системные промпты, тексты реплик и ответы собеседника. Звук, пути к файлам, имя пользователя Windows и содержимое настроек туда не попадают.

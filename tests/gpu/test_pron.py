@@ -149,6 +149,8 @@ def test_assessment_time_for_a_five_second_phrase(env: dict[str, Any]) -> None:
                 "phrase_s": result["duration_s"],
                 "http_roundtrip_s": [round(t, 3) for t in times],
                 "analysis_ms": result["analysis_ms"],
+                "vram_used_mb_all_models": health["gpu"]["vram_used_mb"],
+                "vram_total_mb": health["gpu"]["vram_total_mb"],
             }
         ),
         encoding="utf-8",
