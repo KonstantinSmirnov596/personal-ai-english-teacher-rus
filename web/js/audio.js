@@ -46,16 +46,20 @@ export class AudioEngine {
       await this.ctx.audioWorklet.addModule('/js/capture-worklet.js');
     }
     if (this.ctx.state !== 'running') await this.ctx.resume();
-    await this.openMic(constraints);
+    const key = JSON.stringify(constraints);
+    if (!this.stream || this.micKey !== key) {
+      await this.openMic(constraints);
+      this.micKey = key;
+    }
   }
 
-  async openMic({ deviceId = '', noiseSuppression = true } = {}) {
+  async openMic({ deviceId = '', noiseSuppression = true, autoGainControl = true } = {}) {
     if (this.stream) this.stream.getTracks().forEach((t) => t.stop());
     const audio = {
       channelCount: 1,
       echoCancellation: true,
       noiseSuppression,
-      autoGainControl: true,
+      autoGainControl,
     };
     if (deviceId) audio.deviceId = { exact: deviceId };
     this.stream = await navigator.mediaDevices.getUserMedia({ audio });

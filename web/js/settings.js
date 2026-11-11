@@ -134,6 +134,7 @@ export class SettingsView {
       }
     });
     const ns = this.checkbox('noise', S.noiseSuppression, s.noise_suppression, (v) => this.save({ noise_suppression: v }));
+    const raw = this.checkbox('raw-mic', ru.reading.rawMic, s.reading_raw_mic, (v) => this.save({ reading_raw_mic: v }));
     return el('div', { class: 'settings-group' }, [
       this.field(S.input, input),
       this.field(S.output, output),
@@ -141,6 +142,7 @@ export class SettingsView {
       this.field(S.voice, voice),
       this.field(S.speed, el('div', { class: 'range-row' }, [speed, speedValue, preview])),
       ns,
+      raw,
     ]);
   }
 
@@ -183,7 +185,8 @@ export class SettingsView {
       r.addEventListener('change', () => this.save({ correction_mode: m }));
       list.append(el('label', { class: 'check', for: `corr-${m}` }, [r, el('span', { text: C[m] })]));
     }
-    return el('div', { class: 'settings-group' }, [list]);
+    const pron = this.checkbox('pron-conv', ru.reading.inConversation, this.settings.pron_in_conversation, (v) => this.save({ pron_in_conversation: v }));
+    return el('div', { class: 'settings-group' }, [list, pron]);
   }
 
   dataSection() {

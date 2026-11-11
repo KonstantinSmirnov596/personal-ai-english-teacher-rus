@@ -6,6 +6,7 @@ import { AudioEngine } from './audio.js';
 import { ConnectionsView } from './connections.js';
 import { clear, el, icons } from './dom.js';
 import { HistoryView } from './history.js';
+import { ReadingView } from './reading.js';
 import { SettingsView } from './settings.js';
 import { VocabView } from './vocab.js';
 import { TalkView } from './talk.js';
@@ -29,6 +30,7 @@ class App {
     this.connections = new ConnectionsView(this);
     this.history = new HistoryView(this);
     this.vocab = new VocabView(this);
+    this.reading = new ReadingView(this);
     this.settingsView = new SettingsView(this);
     this.header = el('header', { class: 'header' });
     this.body = el('div', { class: 'app-body' });
@@ -121,6 +123,10 @@ class App {
     if (section === 'settings') {
       current = 'settings';
       this.body.append(sub && sub !== 'connections' ? this.settingsView.render(sub) : this.connections.render());
+    } else if (section === 'reading') {
+      current = 'reading';
+      this.current = current;
+      this.body.append(this.reading.render());
     } else if (section === 'vocab') {
       current = 'vocab';
       this.body.append(this.vocab.render());
@@ -132,13 +138,14 @@ class App {
     }
     this.current = current;
     this.renderHeader();
+    this.talk.syncAuto(); // the detector listens only while the conversation is on screen
   }
 
   renderHeader() {
     const h = clear(this.header);
     const navLink = (key, href) =>
       el('a', { href, 'aria-current': this.current === key ? 'page' : null, text: ru.nav[key] });
-    h.append(el('nav', { class: 'nav', 'aria-label': ru.nav.sections }, [navLink('talk', '#/talk'), navLink('vocab', '#/vocab'), navLink('history', '#/history')]));
+    h.append(el('nav', { class: 'nav', 'aria-label': ru.nav.sections }, [navLink('talk', '#/talk'), navLink('reading', '#/reading'), navLink('vocab', '#/vocab'), navLink('history', '#/history')]));
     const center = el('div', { class: 'header-center' });
     if (this.current === 'talk') this.talk.renderHeaderCenter(center);
     h.append(center);

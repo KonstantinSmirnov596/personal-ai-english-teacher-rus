@@ -355,7 +355,7 @@ export class TalkView {
   async initAudio() {
     const s = this.app.settings || {};
     try {
-      await this.app.audio.init({ deviceId: s.input_device_id || '', noiseSuppression: s.noise_suppression !== false });
+      await this.app.audio.init({ deviceId: s.input_device_id || '', noiseSuppression: s.noise_suppression !== false, autoGainControl: true });
       this.micState = 'ready';
     } catch (e) {
       console.warn('microphone unavailable', e && e.name);
@@ -441,7 +441,7 @@ export class TalkView {
   async syncAuto() {
     const s = this.app.settings || {};
     const busy = this.coreState === 'thinking' || this.coreState === 'speaking' || this.app.audio.playing;
-    const wanted = this.turnMode() === 'auto' && !!this.session && this.micState === 'ready' && this.app.modelsReady;
+    const wanted = this.turnMode() === 'auto' && !!this.session && this.micState === 'ready' && this.app.modelsReady && this.isActive();
     const listen = wanted && (!busy || s.headphones === true) && !(this.autoTurn && this.coreState === 'transcribing');
     try {
       if (listen) {
@@ -660,6 +660,14 @@ export class TalkView {
       case 'corrections':
         this.onCorrections(msg);
         break;
+      case 'pron.flags': {
+        const t = this.turns.get(msg.turn_id);
+        if (t && t.text) {
+          t.pronFlags = msg.items;
+          this.renderCorrections(t);
+        }
+        break;
+      }
       case 'timing': {
         const t = this.turns.get(msg.turn_id);
         if (t) t.node.dataset.coreFirstAudioMs = String(msg.first_audio_ms);
@@ -700,6 +708,18 @@ export class TalkView {
     this.clearPlaceholder(t);
     t.text = msg.text;
     t.textNode.textContent = msg.text;
+    // character span of every recognized word, for pronunciation marks
+    t.wordSpans = [];
+    let from = 0;
+    for (const w of msg.words || []) {
+      const at = msg.text.indexOf(w.w, from);
+      if (at < 0) {
+        t.wordSpans.push(null);
+        continue;
+      }
+      t.wordSpans.push([at, at + w.w.replace(/[.,!?;:]+$/, '').length]);
+      from = at + w.w.length;
+    }
     if (t.pendingCorrections) this.onCorrections(t.pendingCorrections);
   }
 
@@ -750,7 +770,50 @@ export class TalkView {
   }
 
   applyCorrectionMode() {
-    for (const t of this.turns.values()) if (t.role === 'user' && t.corrections) this.renderCorrections(t);
+    for (const t of this.turns.values()) if (t.role === 'user' && t.text) this.renderCorrections(t);
+  }
+
+  // Character ranges of the words flagged by pron.flags (word_index -> span in the text).
+  pronRanges(t) {
+    if (!t.pronFlags || !t.wordSpans) return [];
+    return t.pronFlags
+      .map((flag) => ({ flag, span: t.wordSpans[flag.word_index] }))
+      .filter((x) => x.span)
+      .map((x) => ({ start: x.span[0], end: x.span[1], flag: x.flag }))
+      .sort((x, y) => x.start - y.start);
+  }
+
+  pronMark(t, range, text) {
+    const mark = el('span', { class: 'mark-pron-error', role: 'button', tabindex: '0', 'data-testid': 'pron-mark', 'aria-label': ru.reading.pronMark(text), text });
+    const open = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.showPronCard(t, range.flag, text);
+    };
+    mark.addEventListener('click', open);
+    mark.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') open(e);
+    });
+    return mark;
+  }
+
+  showPronCard(t, flag, word) {
+    if (t.pronCard) t.pronCard.remove();
+    const title = flag.heard ? ru.reading.heardInstead(flag.heard, flag.expected) : ru.reading.notHeard(flag.expected);
+    const close = el('button', { type: 'button', class: 'link-button card-close', text: ru.card.close });
+    t.pronCard = el('section', { class: 'card', lang: 'ru', 'data-testid': 'pron-card' }, [
+      el('div', { class: 'card-item' }, [
+        el('span', { class: 'mark-pron-error mono', lang: 'en', text: word }),
+        el('span', { class: 'pron-title', text: ru.reading.pronTitle }),
+        el('span', { class: 'card-note' }, [`${title}. ${flag.tip_ru} `, el('a', { href: '#/reading', text: ru.reading.trainHere })]),
+      ]),
+      close,
+    ]);
+    close.addEventListener('click', () => {
+      t.pronCard.remove();
+      t.pronCard = null;
+    });
+    t.node.append(t.pronCard);
   }
 
   renderCorrections(t) {
@@ -759,16 +822,32 @@ export class TalkView {
     clear(t.textNode);
     if (t.card) t.card.remove();
     t.card = null;
-    if (mode === 'off' || mode === 'end' || msg.status !== 'ok' || !msg.items.length) {
-      t.textNode.textContent = t.text;
+    const pron = this.pronRanges(t);
+    // Appends text[from, to) and wraps the words flagged for pronunciation.
+    const appendText = (parent, from, to) => {
+      let pos = from;
+      for (const r of pron) {
+        if (r.end <= pos || r.start >= to) continue;
+        const start = Math.max(r.start, pos);
+        const end = Math.min(r.end, to);
+        if (start > pos) parent.append(t.text.slice(pos, start));
+        parent.append(this.pronMark(t, r, t.text.slice(start, end)));
+        pos = end;
+      }
+      if (pos < to) parent.append(t.text.slice(pos, to));
+    };
+    const show = msg && mode !== 'off' && mode !== 'end' && msg.status === 'ok' && msg.items.length;
+    if (!show) {
+      appendText(t.textNode, 0, t.text.length);
       return;
     }
     const marked = msg.items.filter((c) => c.start !== null && c.end !== null).sort((a, b) => a.start - b.start);
     let pos = 0;
     for (const c of marked) {
       if (c.start < pos) continue;
-      if (c.start > pos) t.textNode.append(t.text.slice(pos, c.start));
-      const mark = el('span', { class: 'mark-grammar', role: 'button', tabindex: '0', 'data-testid': 'correction-mark', 'data-correction-id': c.id, 'aria-label': ru.card.markLabel(c.quote), text: t.text.slice(c.start, c.end) });
+      if (c.start > pos) appendText(t.textNode, pos, c.start);
+      const mark = el('span', { class: 'mark-grammar', role: 'button', tabindex: '0', 'data-testid': 'correction-mark', 'data-correction-id': c.id, 'aria-label': ru.card.markLabel(c.quote) });
+      appendText(mark, c.start, c.end);
       const open = (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -781,7 +860,7 @@ export class TalkView {
       t.textNode.append(mark);
       pos = c.end;
     }
-    if (pos < t.text.length) t.textNode.append(t.text.slice(pos));
+    if (pos < t.text.length) appendText(t.textNode, pos, t.text.length);
     t.card = this.buildCard(t, msg);
     t.node.append(t.card);
     if (mode !== 'instant') t.card.classList.add('hidden');

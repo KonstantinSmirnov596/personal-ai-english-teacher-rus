@@ -75,7 +75,7 @@ export function renderSummary(app, summary, meta, onNew) {
         { class: 'summary-list' },
         summary.sounds.map((s) =>
           el('li', { class: 'summary-li row' }, [
-            el('span', { class: 'row-main' }, [el('span', { class: 'mono strong', text: `/${s.phone}/` }), el('span', { lang: 'en', class: 'muted', text: (s.words || []).join(', ') })]),
+            el('span', { class: 'row-main' }, [el('span', { class: 'ipa strong', text: `/${s.phone}/` }), el('span', { lang: 'en', class: 'muted', text: (s.words || []).join(', ') })]),
             el('a', { href: '#/reading', class: 'small', text: S.train }),
           ]),
         ),
