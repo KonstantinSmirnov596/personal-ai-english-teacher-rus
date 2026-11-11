@@ -171,3 +171,39 @@ def test_history_lists_sessions(e2e: E2E) -> None:
     page.locator("article.turn").first.wait_for(timeout=10_000)
     assert page.locator("article.turn.tutor").count() >= 1
     e2e.screenshot("06-history")
+
+
+def test_space_interrupts_reply(e2e: E2E) -> None:
+    """Stage 2.2: Space during the tutor's reply stops the sound and starts a new recording."""
+    page = e2e.new_page()
+    page.goto(e2e.lp.base + "/#/talk")
+    with e2e.http() as c:
+        c.patch("/api/settings", json={"turn_mode": "manual", "correction_mode": "off"})
+        rows = c.get("/api/connections").json()
+        good = next((r for r in rows if r["name"] == "Mock main"), None)
+        if good is None:
+            good = c.post(
+                "/api/connections",
+                json={
+                    "name": "Mock main",
+                    "base_url": e2e.mock.base_url,
+                    "model": "m",
+                    "api_key": e2e.key,
+                },
+            ).json()
+        c.post(f"/api/connections/{good['id']}/activate")
+    page.reload()
+    e2e.wait_models()
+    start_session(page, e2e)
+    long_text = " ".join(f"This is sentence number {i} of a long answer." for i in range(1, 25))
+    e2e.mock.script(text=long_text, chunk_delay_ms=120)
+    speak_one_turn(page)
+    page.wait_for_selector("[data-testid=panel][data-state=speaking]", timeout=60_000)
+    page.keyboard.press("Space")
+    page.wait_for_selector("[data-testid=panel][data-state=listening]", timeout=5000)
+    note = page.locator("[data-testid=turn-tutor] .turn-note")
+    note.first.wait_for(timeout=10_000)
+    page.wait_for_selector("[data-testid=wave][data-source=mic]", timeout=2000)
+    page.keyboard.press("Escape")
+    page.wait_for_selector("[data-testid=panel][data-state=idle]", timeout=10_000)
+    e2e.mock.script()

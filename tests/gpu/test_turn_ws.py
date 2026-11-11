@@ -184,7 +184,13 @@ def test_interrupt_stops_reply_but_not_corrector(env: dict[str, Any]) -> None:
         everything = [r.msg for r in client.log]
         assert any(m["type"] == "corrections" and m["status"] == "ok" for m in everything)
     stream_reqs = [r for r in mock.requests if r["body"].get("stream")]
-    assert stream_reqs  # the tutor request was made and then abandoned
+    assert stream_reqs
+    # The LLM stream was closed by the core, long before the reply was complete.
+    deadline = time.monotonic() + 5
+    while stream_reqs[-1].get("stream_state") == "open" and time.monotonic() < deadline:
+        time.sleep(0.1)
+    assert stream_reqs[-1]["stream_state"] == "closed_by_client"
+    assert stream_reqs[-1].get("chunks_sent", 0) < len(long_text.split()) // 2
 
 
 def test_silence_and_short_turns(env: dict[str, Any]) -> None:

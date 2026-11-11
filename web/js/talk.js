@@ -40,6 +40,7 @@ export class TalkView {
       onMisfire: () => this.onAutoMisfire(),
     });
     this.autoTurn = false;
+    this.interrupted = new Set(); // tutor turn ids stopped by the learner
     this.buildPanel();
     this.app.audio.onPlaybackDrained = () => this.onPlaybackDrained();
     document.addEventListener('keydown', (e) => this.onKeyDown(e));
@@ -329,13 +330,21 @@ export class TalkView {
     if (this.turnMode() === 'auto') {
       // Auto mode: the detector starts and ends turns; Space only stops the tutor's reply.
       if (this.app.audio.playing || this.coreState === 'thinking' || this.coreState === 'speaking') {
-        this.app.audio.stopPlayback();
+        this.stopTutor();
         this.app.socket.send({ type: 'interrupt' });
       }
       return;
     }
     if (this.recording) this.sendTurn();
     else this.startTurn();
+  }
+
+  // Stops the tutor's audio now; sentences of that reply still in flight are dropped.
+  stopTutor() {
+    if (this.currentTutor) this.interrupted.add(this.currentTutor);
+    // A reply may already be on its way; stay silent until the learner's next turn is heard.
+    this.muted = true;
+    this.app.audio.stopPlayback();
   }
 
   // --- auto mode -------------------------------------------------------------------------
@@ -384,7 +393,7 @@ export class TalkView {
     const busy = this.coreState === 'thinking' || this.coreState === 'speaking' || this.app.audio.playing;
     if (busy) {
       if (!s.headphones) return;
-      this.app.audio.stopPlayback(); // voice interruption: the core treats turn.begin as interrupt
+      this.stopTutor(); // voice interruption: the core treats turn.begin as interrupt
     }
     const turnId = uuid();
     this.currentTurnId = turnId;
@@ -427,7 +436,7 @@ export class TalkView {
   startTurn() {
     if (!this.session) return;
     if (this.app.audio.playing || this.coreState === 'thinking' || this.coreState === 'speaking') {
-      this.app.audio.stopPlayback();
+      this.stopTutor();
     }
     const turnId = uuid();
     this.currentTurnId = turnId;
@@ -601,6 +610,7 @@ export class TalkView {
   }
 
   onTranscript(msg) {
+    this.muted = false;
     const t = this.turns.get(msg.turn_id);
     if (!t) return;
     if (!msg.text) {
@@ -617,6 +627,10 @@ export class TalkView {
   onSentence(msg, binary) {
     const t = this.tutorTurn(msg.turn_id);
     if (!binary || !this.app.audio.ctx) return;
+    if ((this.muted || this.interrupted.has(msg.turn_id)) && !msg.replay) {
+      this.interrupted.add(msg.turn_id);
+      return;
+    }
     const startsFresh = this.app.audio.enqueue(binary, msg.audio.sample_rate);
     if (msg.index === 0 && !msg.replay) {
       const userTurn = this.replyFor.get(msg.turn_id);

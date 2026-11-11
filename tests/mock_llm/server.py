@@ -128,7 +128,8 @@ def build_app(state: MockState) -> FastAPI:
     async def completions(request: Request) -> Response:
         body = await request.json()
         auth = request.headers.get("authorization", "")
-        state.requests.append({"body": body, "authorization": auth, "at": time.time()})
+        record: dict[str, Any] = {"body": body, "authorization": auth, "at": time.time()}
+        state.requests.append(record)
         if auth != f"Bearer {state.api_key}":
             return JSONResponse({"error": {"message": "Authentication Fails"}}, status_code=401)
         s = state.script
@@ -145,20 +146,29 @@ def build_app(state: MockState) -> FastAPI:
         if body.get("stream"):
 
             async def events() -> AsyncIterator[bytes]:
-                yield b": keep-alive\n\n"
-                if not s.empty:
-                    for n, chunk in enumerate(_words_chunks(s.text)):
-                        if s.break_after_chunks is not None and n >= s.break_after_chunks:
-                            return  # connection ends without [DONE]
-                        payload = {
-                            "id": "mock",
-                            "object": "chat.completion.chunk",
-                            "choices": [{"index": 0, "delta": {"content": chunk}}],
-                        }
-                        yield f"data: {json.dumps(payload)}\n\n".encode()
-                        if s.chunk_delay_ms:
-                            await asyncio.sleep(s.chunk_delay_ms / 1000)
-                yield b"data: [DONE]\n\n"
+                # stream_state: "open" -> "done" (sent [DONE]) | "closed_by_client"
+                record["stream_state"] = "open"
+                try:
+                    yield b": keep-alive\n\n"
+                    if not s.empty:
+                        for n, chunk in enumerate(_words_chunks(s.text)):
+                            if s.break_after_chunks is not None and n >= s.break_after_chunks:
+                                record["stream_state"] = "broken"
+                                return  # connection ends without [DONE]
+                            payload = {
+                                "id": "mock",
+                                "object": "chat.completion.chunk",
+                                "choices": [{"index": 0, "delta": {"content": chunk}}],
+                            }
+                            yield f"data: {json.dumps(payload)}\n\n".encode()
+                            record["chunks_sent"] = n + 1
+                            if s.chunk_delay_ms:
+                                await asyncio.sleep(s.chunk_delay_ms / 1000)
+                    yield b"data: [DONE]\n\n"
+                    record["stream_state"] = "done"
+                except (asyncio.CancelledError, GeneratorExit):
+                    record["stream_state"] = "closed_by_client"
+                    raise
 
             return StreamingResponse(events(), media_type="text/event-stream")
 
