@@ -93,6 +93,19 @@ def test_helpers_summary_and_vocab(e2e: E2E) -> None:
     e2e.screenshot("11-vocab")
 
 
+def wait_settings(e2e: E2E, timeout: float = 15, **expected: Any) -> None:
+    """Poll the core until the window's saves arrived (they are asynchronous)."""
+    deadline = time.monotonic() + timeout
+    current: dict[str, Any] = {}
+    while time.monotonic() < deadline:
+        with e2e.http() as c:
+            current = c.get("/api/settings").json()
+        if all(current.get(k) == v for k, v in expected.items()):
+            return
+        time.sleep(0.2)
+    raise AssertionError(f"settings not saved: {expected} vs {current}")
+
+
 def test_settings_sections(e2e: E2E) -> None:
     ensure_connection(e2e)
     page = e2e.new_page()
@@ -106,15 +119,11 @@ def test_settings_sections(e2e: E2E) -> None:
     slider.dispatch_event("change")
     page.wait_for_selector("[data-testid=settings-status]:has-text('Сохранено')")
     page.check("#set-headphones")
-    time.sleep(0.5)
-    with e2e.http() as c:
-        s: dict[str, Any] = c.get("/api/settings").json()
-    assert s["pause_ms"] == 2200 and s["headphones"] is True
+    wait_settings(e2e, pause_ms=2200, headphones=True)
     page.goto(e2e.lp.base + "/#/settings/sound")
     page.wait_for_selector("[data-testid=voice-select]")
     page.select_option("[data-testid=voice-select]", "am_michael")
-    time.sleep(0.5)
+    wait_settings(e2e, voice="am_michael")
     with e2e.http() as c:
-        assert c.get("/api/settings").json()["voice"] == "am_michael"
         c.patch("/api/settings", json={"voice": "af_heart", "pause_ms": 1500, "headphones": False})
     e2e.screenshot("12-settings-sound")

@@ -341,3 +341,13 @@ def test_export_all(tmp_path: Path) -> None:
 def test_delete_all_direct_call(tmp_path: Path) -> None:
     with make_app(tmp_path) as ctx:
         assert delete_all_data(ctx.core, include_keys=False)["ok"] is True
+
+
+def test_synthesis_service_rejects_cyrillic_before_any_model_work() -> None:
+    """Russian text never reaches synthesis: the service refuses it without loading the model."""
+    from trainer.speech.tts import CyrillicTextError, SpeechSynthesizer
+
+    tts = SpeechSynthesizer(device="cpu")
+    with pytest.raises(CyrillicTextError):
+        tts.synthesize("Скажите это по-английски.")
+    assert not tts.loaded

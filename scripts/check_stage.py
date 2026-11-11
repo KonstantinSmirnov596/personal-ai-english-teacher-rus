@@ -79,6 +79,28 @@ STAGES: dict[int, Stage] = {
         ),
         reports=("stage1.md",),
     ),
+    2: Stage(
+        suites=("fast", "gpu", "e2e"),
+        optional_suites=("live",),
+        required_tests=(
+            "tests.e2e.test_auto::test_pause_below_threshold_keeps_one_turn",
+            "tests.e2e.test_auto::test_pause_above_threshold_splits_turn",
+            "tests.gpu.test_turn_ws::test_interrupt_stops_reply_but_not_corrector",
+            "tests.e2e.test_conversation::test_space_interrupts_reply",
+            "tests.test_stage2_logic::test_text_helpers",
+            "tests.test_stage2_logic::test_hint_with_cyrillic_is_rejected_after_retry",
+            "tests.test_stage2_logic::test_summary_with_mock",
+            "tests.test_stage2_logic::test_synthesis_service_rejects_cyrillic_before_any_model_work",
+            "tests.gpu.test_speech::test_synthesis_rejects_cyrillic",
+            "tests.test_stage2_logic::test_pattern_focus_after_three_sessions_and_close_after_three_clean",
+            "tests.test_stage2_logic::test_cleanup_removes_audio_older_than_retention",
+            "tests.test_stage2_logic::test_delete_all_data_keeps_keys_without_flag",
+            "tests.test_stage2_logic::test_vocab_spaced_repetition",
+            "tests.e2e.test_stage2_ui::test_helpers_summary_and_vocab",
+            "tests.e2e.test_stage2_ui::test_settings_sections",
+        ),
+        reports=("stage2.md",),
+    ),
 }
 
 
