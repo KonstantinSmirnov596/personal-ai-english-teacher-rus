@@ -1,1 +1,1 @@
-{"phrase_s": 5.0, "http_roundtrip_s": [0.098, 0.097, 0.102], "analysis_ms": 94, "vram_used_mb_all_models": 4411, "vram_total_mb": 8150}
+{"phrase_s": 5.0, "http_roundtrip_s": [0.099, 0.111, 0.056], "analysis_ms": 48, "vram_used_mb_all_models": 4411, "vram_total_mb": 8150}
