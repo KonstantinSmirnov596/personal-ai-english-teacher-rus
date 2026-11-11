@@ -38,7 +38,9 @@ class E2E:
             self.page.close()
         self.page = self.context.new_page()
         self.page.on("console", lambda m: self.console.append(f"{m.type}: {m.text}"))
+        self.page.on("request", lambda r: self.requests.append(r.url))
         self.console: list[str] = []
+        self.requests: list[str] = []
         return self.page
 
     def http(self) -> httpx.Client:

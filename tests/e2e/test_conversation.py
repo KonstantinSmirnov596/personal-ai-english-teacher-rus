@@ -132,6 +132,10 @@ def test_conversation_turn(e2e: E2E) -> None:
     )
     assert not [t for t in ru_outside if CYRILLIC.search(t)]
     assert not [line for line in e2e.console if line.startswith("error")], e2e.console
+    # the window loads everything from the core: no CDN, fonts or scripts from outside
+    allowed = (e2e.lp.base + "/", "blob:", "data:")
+    assert len(e2e.requests) > 20
+    assert not [u for u in e2e.requests if not u.startswith(allowed)]
 
 
 def test_connection_failure_offers_manual_switch(e2e: E2E) -> None:

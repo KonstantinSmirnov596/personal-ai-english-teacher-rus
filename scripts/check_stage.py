@@ -34,6 +34,7 @@ class Stage:
     reports: tuple[str, ...] = ()
     files: tuple[str, ...] = ()
     optional_suites: tuple[str, ...] = ()
+    clean_install: bool = False
 
 
 STAGES: dict[int, Stage] = {
@@ -119,6 +120,22 @@ STAGES: dict[int, Stage] = {
             "tests.e2e.test_pron_marks::test_pronunciation_mark_in_conversation",
         ),
         reports=("stage3.md",),
+    ),
+    4: Stage(
+        suites=("fast", "gpu", "e2e"),
+        optional_suites=("live",),
+        required_tests=(
+            "tests.test_operations::test_second_launch_does_not_start_a_second_core",
+            "tests.test_operations::test_no_gpu_is_reported_in_plain_words",
+            "tests.test_operations::test_missing_models_are_reported",
+            "tests.test_operations::test_log_rotation_keeps_a_bounded_number_of_files",
+            "tests.gpu.test_network::test_core_talks_only_to_localhost_and_the_llm",
+            "tests.gpu.test_startup::test_startup_time",
+            "tests.e2e.test_shortcut::test_shortcut_starts_app_once_and_core_exits_with_window",
+        ),
+        reports=("final.md",),
+        files=("README.md", "assets/trainer.ico"),
+        clean_install=True,
     ),
 }
 
@@ -241,6 +258,19 @@ def main() -> int:
             if not (REPO / f).exists():
                 problems.append(f"required file missing: {f}")
 
+    clean_note = ""
+    if any(st.clean_install for st in stages):
+        print("=== setup from scratch on a clean copy ===", flush=True)
+        clean = subprocess.run(
+            [sys.executable, str(REPO / "scripts" / "check_clean_install.py")],
+            cwd=REPO,
+            env=os.environ.copy(),
+            check=False,
+        )
+        clean_note = "passed" if clean.returncode == 0 else "FAILED"
+        if clean.returncode != 0:
+            problems.append("setup from scratch failed (scripts/check_clean_install.py)")
+
     print()
     print(f"=== stage {target} summary ===")
     for s in suites:
@@ -249,6 +279,8 @@ def main() -> int:
             f"  {s:5}: exit {r.exit_code}, passed {len(r.passed)}, "
             f"failed {len(r.failed)}, skipped {len(r.skipped)}"
         )
+    if clean_note:
+        print(f"  clean install: {clean_note}")
     for n in notes:
         print(f"  NOTE: {n}")
     for p in problems:

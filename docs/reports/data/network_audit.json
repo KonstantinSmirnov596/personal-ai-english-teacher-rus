@@ -1,0 +1,8 @@
+{
+  "events": 4,
+  "outside": 0,
+  "by_kind": {
+    "connect 127.0.0.1 -> other local": 1,
+    "connect 127.0.0.1 -> llm (mock)": 3
+  }
+}

@@ -93,7 +93,7 @@ def test_missing_models_are_reported(tmp_path: Path) -> None:
 
 
 def test_core_runs_with_hf_offline_and_logs_to_file(tmp_path: Path) -> None:
-    lp = LauncherProcess(tmp_path, "--no-models", env={"HF_HUB_OFFLINE": ""})
+    lp = LauncherProcess(tmp_path, "--no-models", unset=("HF_HUB_OFFLINE",))
     try:
         lp.login()
         with lp.http() as http:

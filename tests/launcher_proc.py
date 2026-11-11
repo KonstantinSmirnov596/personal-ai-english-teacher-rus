@@ -19,15 +19,24 @@ REPO = Path(__file__).resolve().parent.parent
 
 
 class LauncherProcess:
-    def __init__(self, data_dir: Path, *extra_args: str, env: dict[str, str] | None = None) -> None:
+    def __init__(
+        self,
+        data_dir: Path,
+        *extra_args: str,
+        env: dict[str, str] | None = None,
+        unset: tuple[str, ...] = (),
+        entry: tuple[str, ...] = ("-m", "trainer.launcher"),
+    ) -> None:
         self.data_dir = data_dir
         full_env = os.environ.copy()
         full_env["TRAINER_DATA_DIR"] = str(data_dir)
         full_env["PYTHONUNBUFFERED"] = "1"
         if env:
             full_env.update(env)
+        for name in unset:
+            full_env.pop(name, None)
         self.proc = subprocess.Popen(
-            [sys.executable, "-m", "trainer.launcher", "--no-window", "--port", "0", *extra_args],
+            [sys.executable, *entry, "--no-window", "--port", "0", *extra_args],
             cwd=REPO,
             env=full_env,
             stdout=subprocess.PIPE,
