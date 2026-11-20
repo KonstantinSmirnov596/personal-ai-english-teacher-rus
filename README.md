@@ -1,10 +1,14 @@
-# Тренажёр: голосовая практика американского английского
+# Personal AI English Teacher (RUS) for Desktop/Notebook with GPU
 
-Приложение для Windows: вы разговариваете голосом с ИИ-собеседником, получаете правки на русском и оценку произношения. Распознавание и синтез речи работают на вашем компьютере; наружу уходит только текст диалога в выбранный LLM API.
+*Spoken American English practice for Russian speakers on Windows with an NVIDIA GPU. The interface and the documentation are in Russian. The version for Spanish and Brazilian Portuguese speakers: [Personal AI English Teacher (ES/PT)](https://github.com/KonstantinSmirnov596/personal-ai-english-teacher).*
+
+**Тренажёр: голосовая практика американского английского для русскоговорящих.** Приложение для Windows: вы разговариваете голосом с ИИ-собеседником, получаете правки на русском и оценку произношения. Распознавание и синтез речи работают на вашем компьютере; наружу уходит только текст диалога в выбранный LLM API.
 
 Рассчитано на один компьютер с видеокартой NVIDIA (проверено на RTX 5060 Laptop, 8 ГБ) и Windows 11.
 
 ## Установка
+
+Скачайте архив `EnglishTeacher-RUS-<версия>.zip` со [страницы релизов](https://github.com/KonstantinSmirnov596/personal-ai-english-teacher-rus/releases) (или клонируйте репозиторий) и распакуйте его в папку с коротким путём, например `C:\EnglishTeacherRUS`.
 
 Нужны: Python 3.12 ([python.org](https://www.python.org/downloads/), установка «для себя», права администратора не требуются), свежий драйвер NVIDIA, Microsoft Edge и около 15 ГБ на диске.
 
@@ -87,3 +91,7 @@
 - `scripts\test.ps1 fast|gpu|e2e|live|all` — наборы тестов; `live` обращается к вашему провайдеру и тратит деньги (не больше 80 запросов).
 - `scripts\check_stage.ps1 <N>` — приёмка этапа: тесты, отчёты, установка с нуля.
 - Проект системы, план и отчёты по этапам с замерами — в `docs\`; известные ограничения — в `docs\reports\final.md`.
+
+## Лицензия
+
+MIT, см. [LICENSE](LICENSE). Модели и библиотеки, которые скачивает `scripts\setup.ps1`, распространяются по своим лицензиям: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
