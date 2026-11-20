@@ -30,3 +30,6 @@ web/vendor/
 
 # application shortcut is created by scripts/setup.ps1
 *.lnk
+
+# release archives
+dist/

@@ -41,6 +41,9 @@ class SpeechSynthesizer:
     def load(self) -> None:
         if self._pipeline is not None:
             return
+        from trainer import espeak_path
+
+        espeak_path.configure()  # before misaki creates its espeak fallback
         from kokoro import KModel, KPipeline
 
         root = local_path(TTS)

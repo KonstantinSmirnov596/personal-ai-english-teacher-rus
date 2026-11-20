@@ -1,76 +1,133 @@
-# Prepares everything the app needs: Python environment, dependencies, models.
-# Safe to run again: every step checks what is already in place.
+# Installs or updates the trainer (Personal AI English Teacher RUS). Started by install.cmd; no
+# system Python and no administrator rights needed. Safe to run again: every step checks what is
+# in place.
+#
+#   1. requirements and folders, before anything is downloaded
+#   2. uv from its GitHub release (SHA-256 pinned in installer.ps1)
+#   3. Python 3.12 through uv, into .tools\python (uv checks its SHA-256)
+#   4. packages from uv.lock into .venv (uv checks every hash in the lock file)
+#   5. models by pinned commit (trainer/model_registry.py); an interrupted download continues
+#   6. fonts and the voice detector by sha512
+#   7. shortcuts, then the app starts
+#
+# Options:
+#   -NoHardwareCheck  developer machines without an NVIDIA GPU (CI): only the Python environment
+#                     is needed there; the app checks the hardware at every start anyway
+#   -SkipModels       do not download models
+#   -Shortcuts ask|yes|no  Desktop and Start menu shortcuts (ask: a question in the console)
+#   -NoLaunch         do not start the app at the end
+#   -Dev              also install the developer tools (pytest, ruff, Playwright) for the tests
 param(
-    [switch]$SkipModels
+    [switch]$SkipModels,
+    [switch]$NoHardwareCheck,
+    [ValidateSet('ask', 'yes', 'no')][string]$Shortcuts = 'ask',
+    [switch]$NoLaunch,
+    [switch]$Dev
 )
 . "$PSScriptRoot\_common.ps1"
+. "$PSScriptRoot\requirements.ps1"
+. "$PSScriptRoot\installer.ps1"
 Set-TrainerEnv
+# Russian messages stay intact when the output is redirected to a log.
+try { [Console]::OutputEncoding = [System.Text.Encoding]::UTF8 } catch { }
 
-$UvVersion = '0.13.7'
-
+$Lang = Get-TrLanguage
+$Msg = (Get-TrMessages).$Lang
+function Say([string]$Key, [hashtable]$Values = @{}) { return (Format-TrText ([string]$Msg.$Key) $Values) }
 function Write-Step([string]$Text) { Write-Host "--- $Text" -ForegroundColor Cyan }
 
-# 1. Python 3.12 through the py launcher.
-Write-Step 'Python 3.12'
-$basePython = $null
-try { $basePython = (& py -3.12 -c 'import sys; print(sys.executable)' 2>$null) } catch { $basePython = $null }
-if (-not $basePython -or $LASTEXITCODE -ne 0) {
-    throw 'Python 3.12 not found. Install it from python.org (per-user install, no admin rights needed) and run setup again.'
+function Stop-Setup([string]$Reason) {
+    Write-Host ''
+    Write-Host (Say 'failed' @{ reason = $Reason }) -ForegroundColor Red
+    Write-Host (Say 'failed_hint')
+    exit 1
 }
-$basePython = $basePython.Trim()
-Write-Host "using $basePython"
 
-# 2. uv in a private tools environment inside the project (no global installs).
-Write-Step "uv $UvVersion"
-$uvVenv = Join-Path $ToolsDir 'uv'
-if (-not (Test-Path (Join-Path $uvVenv 'Scripts\python.exe'))) {
-    Invoke-Checked $basePython -m venv $uvVenv
-}
-$haveUv = $null
-if (Test-Path $UvExe) { $haveUv = ((& $UvExe --version) -split ' ')[1] }
-if ($haveUv -ne $UvVersion) {
-    Invoke-Checked (Join-Path $uvVenv 'Scripts\python.exe') -m pip install --disable-pip-version-check --quiet "uv==$UvVersion"
-}
-Invoke-Checked $UvExe --version
-
-# 3. Project environment from the lock file.
-Write-Step 'dependencies (uv sync --locked)'
-Push-Location $RepoRoot
 try {
-    if (Test-Path (Join-Path $RepoRoot 'uv.lock')) {
-        Invoke-Checked $UvExe sync --locked --python $basePython
-    } else {
-        Write-Host 'uv.lock not found: resolving dependencies for the first time'
-        Invoke-Checked $UvExe lock --python $basePython
-        Invoke-Checked $UvExe sync --locked --python $basePython
+    # 1. Requirements and folders, before any download.
+    if ($NoHardwareCheck) {
+        Write-Host 'requirements check skipped (-NoHardwareCheck)' -ForegroundColor Yellow
+    } elseif (-not (Invoke-TrRequirements -RepoRoot $RepoRoot -DataDir (Get-TrainerDataDir))) {
+        exit 1
     }
-} finally {
-    Pop-Location
-}
+    Write-Step (Say 'step_path')
+    $pathProblems = @(Test-TrInstallPath -AppDir $RepoRoot -DataDir (Get-TrainerDataDir))
+    if ($pathProblems.Count -gt 0) {
+        foreach ($p in $pathProblems) { Write-Host ('  - ' + (Say $p.Id @{ path = $p.Path })) -ForegroundColor Red }
+        exit 1
+    }
 
-# 4. Models into the application data directory.
-if ($SkipModels) {
-    Write-Step 'models: skipped (-SkipModels)'
-} elseif (Test-Path (Join-Path $RepoRoot 'trainer\setup_models.py')) {
-    Write-Step "models -> $(Get-TrainerModelsDir)"
+    # 2. uv.
+    Write-Step (Say 'step_uv' @{ version = $script:TrUvVersion })
+    $uv = Install-TrUv -ToolsDir $ToolsDir
+    Invoke-Checked $uv --version
+
+    # 3. Python, private to the app: no PATH entries, no registry entries.
+    Write-Step (Say 'step_python' @{ version = $script:TrPythonVersion })
+    $env:UV_PYTHON_DOWNLOADS = 'manual'
+    Invoke-Checked $uv python install $script:TrPythonVersion --install-dir $PythonDir --no-bin --no-registry
+    $python = (& $uv python find $script:TrPythonVersion --managed-python | Select-Object -First 1)
+    if ($LASTEXITCODE -ne 0 -or -not $python) { throw 'Python was installed but uv cannot find it' }
+    $env:UV_PYTHON_DOWNLOADS = 'never'
+    Write-Host "  $($python.Trim())"
+
+    # 4. Packages from the lock file.
+    Write-Step (Say 'step_packages')
     Push-Location $RepoRoot
-    try { Invoke-Checked $VenvPython -m trainer.setup_models } finally { Pop-Location }
+    try {
+        # Users get the app's packages only; developers add the test tools with -Dev.
+        if ($Dev) {
+            Invoke-Checked $uv sync --locked --python $python.Trim()
+        } else {
+            Invoke-Checked $uv sync --locked --no-dev --python $python.Trim()
+        }
+    } finally {
+        Pop-Location
+    }
+
+    # 5. Models.
+    if ($SkipModels) {
+        Write-Host 'models skipped (-SkipModels)' -ForegroundColor Yellow
+    } else {
+        Write-Step (Say 'step_models')
+        Push-Location $RepoRoot
+        try {
+            & $VenvPython -m trainer.setup_models
+            if ($LASTEXITCODE -ne 0) { throw "model download failed (exit code $LASTEXITCODE)" }
+        } finally { Pop-Location }
+    }
+
+    # 6. Window assets.
+    Write-Step (Say 'step_assets')
+    Push-Location $RepoRoot
+    try {
+        Invoke-Checked $VenvPython -m trainer.setup_fonts
+        Invoke-Checked $VenvPython -m trainer.setup_vendor
+    } finally {
+        Pop-Location
+    }
+
+    # 7. Shortcuts: always in the app folder; Desktop and Start menu on request.
+    Write-Step (Say 'step_shortcuts')
+    $wantLinks = $false
+    if ($Shortcuts -eq 'yes') { $wantLinks = $true }
+    elseif ($Shortcuts -eq 'ask') { $wantLinks = Read-TrYesNo -Question (Say 'shortcuts_question') -YesLetters ([string]$Msg.yes_letters) }
+    if ($wantLinks) {
+        & (Join-Path $PSScriptRoot 'make_shortcut.ps1') -Desktop -StartMenu
+    } else {
+        & (Join-Path $PSScriptRoot 'make_shortcut.ps1')
+    }
+    if ($LASTEXITCODE -ne 0) { throw 'shortcut creation failed' }
+} catch {
+    $text = $_.Exception.Message
+    if ($text -like 'checksum:*') { Stop-Setup (Say 'failed_checksum' @{ what = $text.Substring(9) }) }
+    Stop-Setup $text
 }
 
-# 5. Window fonts (Inter, JetBrains Mono) into web\fonts.
-Write-Step 'fonts -> web\fonts'
-Push-Location $RepoRoot
-try {
-    Invoke-Checked $VenvPython -m trainer.setup_fonts
-    # 6. Voice activity detection for the window (Silero VAD, ONNX Runtime Web) into web\vendor.
-    Write-Step 'vendor -> web\vendor'
-    Invoke-Checked $VenvPython -m trainer.setup_vendor
-} finally { Pop-Location }
-
-# 7. Shortcut in the project folder (copy it to the Desktop with scripts\make_shortcut.ps1 -Desktop).
-Write-Step 'shortcut'
-& (Join-Path $PSScriptRoot 'make_shortcut.ps1')
-if ($LASTEXITCODE -ne 0) { throw 'shortcut creation failed' }
-
-Write-Host 'setup: OK' -ForegroundColor Green
+Write-Host (Say 'done') -ForegroundColor Green
+if (-not $NoLaunch) {
+    Write-Host (Say 'launching')
+    $pythonw = Join-Path $VenvDir 'Scripts\pythonw.exe'
+    Start-Process -FilePath $pythonw -ArgumentList '-m', 'trainer.launcher' -WorkingDirectory $RepoRoot
+}
 exit 0

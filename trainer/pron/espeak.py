@@ -24,6 +24,9 @@ def _get_backend() -> Any:
             from phonemizer.backend import EspeakBackend
             from phonemizer.backend.espeak.wrapper import EspeakWrapper
 
+            from trainer import espeak_path
+
+            espeak_path.configure()  # non-ASCII app folders (see trainer/espeak_path.py)
             EspeakWrapper.set_library(espeakng_loader.get_library_path())
             EspeakWrapper.set_data_path(espeakng_loader.get_data_path())
             _backend = EspeakBackend(

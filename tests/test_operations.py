@@ -87,7 +87,7 @@ def test_missing_models_are_reported(tmp_path: Path) -> None:
                 time.sleep(0.5)
                 health = http.get("/api/health").json()
         assert [p["code"] for p in health["problems"]] == ["models_missing"]
-        assert "setup.ps1" in health["problems"][0]["message_ru"]
+        assert "install.cmd" in health["problems"][0]["message_ru"]
     finally:
         lp.stop()
 

@@ -9,7 +9,8 @@ $setupOk = $true
 if ($Stage -ge 0) {
     # Stage 0 criterion: a repeated setup run finishes without errors.
     Write-Host '=== repeated setup run ===' -ForegroundColor Cyan
-    & (Join-Path $PSScriptRoot 'setup.ps1')
+    # The developer setup: keeps the test tools and touches neither the Desktop nor a window.
+    & (Join-Path $PSScriptRoot 'setup.ps1') -Dev -Shortcuts no -NoLaunch
     if ($LASTEXITCODE -ne 0) { $setupOk = $false }
 }
 
