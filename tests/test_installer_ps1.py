@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import zipfile
@@ -153,6 +154,12 @@ def test_setup_order_and_pins() -> None:
     assert "$script:TrUvVersion = '0.13.7'" in installer
     assert "0cdc5b38fe5a8168ed6a25814f5ba43c21d313dd3187314fccb37b7cec46e021" in installer
     assert "py -3" not in setup  # no system Python
+    # Windows PowerShell 5.1 stops a native command piped into Select-Object -First early, and
+    # its exit code then reads -1 (the first clean install into a Cyrillic folder failed so).
+    native_first = r"&\s*\$\w+[^\n|]*\|\s*Select-Object\s+-First"
+    for name in ("setup.ps1", "installer.ps1", "uninstall.ps1", "requirements.ps1"):
+        text = (SCRIPTS / name).read_text(encoding="ascii")
+        assert not re.search(native_first, text), name
 
 
 def test_cmd_wrappers() -> None:

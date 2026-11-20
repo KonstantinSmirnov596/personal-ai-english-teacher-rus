@@ -66,8 +66,11 @@ try {
     Write-Step (Say 'step_python' @{ version = $script:TrPythonVersion })
     $env:UV_PYTHON_DOWNLOADS = 'manual'
     Invoke-Checked $uv python install $script:TrPythonVersion --install-dir $PythonDir --no-bin --no-registry
-    $python = (& $uv python find $script:TrPythonVersion --managed-python | Select-Object -First 1)
-    if ($LASTEXITCODE -ne 0 -or -not $python) { throw 'Python was installed but uv cannot find it' }
+    # Capture all output first: piping a native command into Select-Object -First 1 stops it early
+    # in Windows PowerShell 5.1, and its exit code then reads -1.
+    $found = @(& $uv python find $script:TrPythonVersion --managed-python)
+    if ($LASTEXITCODE -ne 0 -or $found.Count -eq 0) { throw 'Python was installed but uv cannot find it' }
+    $python = [string]$found[0]
     $env:UV_PYTHON_DOWNLOADS = 'never'
     Write-Host "  $($python.Trim())"
 
